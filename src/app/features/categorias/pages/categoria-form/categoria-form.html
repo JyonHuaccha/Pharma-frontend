@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="header-acciones">
+    <h2>{{ id() ? 'Editar Categoría' : 'Nueva Categoría' }}</h2>
+    <a routerLink="/categorias" class="btn-secundario">← Volver</a>
+  </div>
+
+  @if (errorGeneral()) {
+  <div class="alert-error">{{ errorGeneral() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="formulario">
+    <div class="form-grupo">
+      <label for="nombre">Nombre <span class="obligatorio">*</span></label>
+      <input id="nombre" type="text" formControlName="nombre" class="form-control" />
+      @if (form.get('nombre')?.touched && form.get('nombre')?.invalid) {
+      <span class="error-texto">El nombre es obligatorio.</span>
+      }
+      @if (erroresValidacion()['nombre']) {
+      <span class="error-texto">{{ erroresValidacion()['nombre'] }}</span>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="form-grupo checkbox-grupo">
+      <label>
+        <input type="checkbox" formControlName="estado" />
+        Activo
+      </label>
+    </div>
+
+    <div class="form-acciones">
+      <button type="submit" class="btn-primario" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Guardar' }}
+      </button>
+      <a routerLink="/categorias" class="btn-secundario">Cancelar</a>
+    </div>
+  </form>
+</div>

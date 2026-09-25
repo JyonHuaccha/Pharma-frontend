@@ -1,0 +1,12 @@
+:host { display: block; }
+.sidebar {
+  width: 260px; background: #f8fafc; border-right: 1px solid #e2e8f0;
+  height: calc(100vh - 64px); padding: 16px 0; box-sizing: border-box;
+}
+.menu-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+  color: #334155; text-decoration: none; font-weight: 500; transition: background 0.2s;
+}
+.menu-item:hover { background: #f1f5f9; color: #0f2e5c; }
+.menu-item.activo { background: #e0e7ff; color: #1e3a8a; font-weight: 600; border-right: 4px solid #1e3a8a; }
+.icono { font-size: 18px; }

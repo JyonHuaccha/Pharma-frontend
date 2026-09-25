@@ -1,0 +1,69 @@
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CategoriaService } from '../../services/categoria.service';
+import { Categoria } from '../../models/categoria.model';
+import { mensajeError } from '../../../../core/utils/http-error';
+
+@Component({
+  selector: 'app-categoria-list',
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './categoria-list.html',
+  styleUrl: './categoria-list.css',
+})
+export class CategoriaList implements OnInit {
+  private readonly categoriaService = inject(CategoriaService);
+
+  protected readonly categorias = signal<Categoria[]>([]);
+  protected readonly cargando = signal<boolean>(true);
+  protected readonly error = signal<string | null>(null);
+
+  // Señal para el buscador
+  protected readonly filtroBusqueda = signal<string>('');
+
+  // Computada para filtrar las categorías en tiempo real sin recargar
+  protected readonly categoriasFiltradas = computed(() => {
+    const texto = this.filtroBusqueda().toLowerCase().trim();
+    const lista = this.categorias();
+    if (!texto) return lista;
+    return lista.filter(
+      (cat) =>
+        cat.nombre.toLowerCase().includes(texto) ||
+        (cat.descripcion && cat.descripcion.toLowerCase().includes(texto)),
+    );
+  });
+
+  ngOnInit(): void {
+    this.cargarCategorias();
+  }
+
+  cargarCategorias(): void {
+    this.cargando.set(true);
+    this.error.set(null);
+    this.categoriaService.listar().subscribe({
+      next: (datos) => {
+        this.categorias.set(datos);
+        this.cargando.set(false);
+      },
+      error: (err) => {
+        this.error.set(mensajeError(err));
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  eliminar(id: number): void {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+      return;
+    }
+    this.categoriaService.eliminar(id).subscribe({
+      next: () => {
+        this.cargarCategorias();
+      },
+      error: (err) => {
+        alert(mensajeError(err));
+      },
+    });
+  }
+}

@@ -1,0 +1,9 @@
+<app-header (toggleMenu)="toggleSidebar()" />
+<div class="layout-body">
+  @if (sidebarVisible()) {
+  <app-sidebar />
+  }
+  <main class="contenido">
+    <router-outlet />
+  </main>
+</div>

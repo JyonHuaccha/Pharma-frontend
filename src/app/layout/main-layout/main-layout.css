@@ -1,0 +1,11 @@
+:host { display: block; height: 100vh; overflow: hidden; }
+.layout-body {
+  display: flex;
+  height: calc(100vh - 64px);
+}
+.contenido {
+  flex: 1;
+  background: #f1f5f9;
+  padding: 24px;
+  overflow-y: auto;
+}
