@@ -1,0 +1,81 @@
+<div class="card">
+  <div class="page-header">
+    <h2>Gestión de Clientes</h2>
+    <a routerLink="nuevo" class="btn btn-primary">+ Nuevo Cliente</a>
+  </div>
+
+  <div class="mb-3">
+    <input
+      type="text"
+      class="input"
+      placeholder="Filtrar por DNI, nombres o apellidos..."
+      [ngModel]="filtroBusqueda()"
+      (ngModelChange)="filtroBusqueda.set($event); paginaActual.set(0)"
+    />
+  </div>
+
+  @if (cargando()) {
+  <div style="padding: 12px; background: #e0f2fe; color: #0369a1; border-radius: 6px; margin-bottom: 12px;">Cargando clientes...</div>
+  }
+  @if (error()) {
+  <div style="padding: 12px; background: #fee2e2; color: #991b1b; border-radius: 6px; margin-bottom: 12px;">{{ error() }}</div>
+  }
+
+  <div style="overflow-x: auto;">
+    <table class="tabla">
+      <thead>
+      <tr>
+        <th (click)="ordenar('dni')">DNI</th>
+        <th (click)="ordenar('apellidos')">Apellidos y Nombres</th>
+        <th (click)="ordenar('email')">Correo</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      @for (c of clientesPagina(); track c.id) {
+      <tr>
+        <td>{{ c.dni }}</td>
+        <td>{{ c.apellidos }}, {{ c.nombres }}</td>
+        <td>{{ c.email }}</td>
+        <td>{{ c.telefono || '—' }}</td>
+        <td>
+              <span class="badge" [class.inactivo]="!c.estado">
+                {{ c.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+        </td>
+        <td>
+          <div style="display: flex; gap: 8px;">
+            <a [routerLink]="[c.id, 'editar']" class="btn" style="padding: 4px 10px; font-size: 12px; background: #fef08a; border-color: #fde047; color: #854d0e;">Editar</a>
+            @if (c.estado) {
+            <button class="btn btn-peligro" style="padding: 4px 10px; font-size: 12px;" (click)="darDeBaja(c.id)">Dar de baja</button>
+            }
+          </div>
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="6" style="text-align: center; padding: 20px; color: #6b7280;">No se encontraron clientes.</td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Controles de Paginación -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 14px; color: #4b5563;">
+    <div>
+      <span>Página {{ paginaActual() + 1 }} de {{ totalPaginas() }} · {{ totalElementos() }} clientes</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <select class="input" style="width: auto; padding: 6px 10px;" (change)="cambiarTamanio($event)" [value]="tamanioPagina()">
+        <option value="5">5 por pág.</option>
+        <option value="10">10 por pág.</option>
+        <option value="20">20 por pág.</option>
+      </select>
+      <button class="btn" [disabled]="paginaActual() === 0" (click)="cambiarPagina(-1)">Anterior</button>
+      <button class="btn" [disabled]="esUltima()" (click)="cambiarPagina(1)">Siguiente</button>
+    </div>
+  </div>
+</div>

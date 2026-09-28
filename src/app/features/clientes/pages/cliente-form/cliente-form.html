@@ -1,0 +1,66 @@
+<div class="container">
+  <h2>{{ isEditMode() ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}</h2>
+
+  @if (errorMessage()) {
+  <div class="alert-error">{{ errorMessage() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="formulario">
+
+    <div class="form-grupo">
+      <label>DNI <span class="obligatorio">*</span></label>
+      <input type="text" class="form-control" formControlName="dni" maxlength="8" placeholder="Ingrese 8 dígitos">
+      @if (form.get('dni')?.invalid && form.get('dni')?.touched) {
+      <small class="error-texto">El DNI es obligatorio y debe tener exactamente 8 dígitos.</small>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label>Nombres <span class="obligatorio">*</span></label>
+      <input type="text" class="form-control" formControlName="nombres" placeholder="Nombres del cliente">
+      @if (form.get('nombres')?.invalid && form.get('nombres')?.touched) {
+      <small class="error-texto">Los nombres son obligatorios (entre 2 y 100 caracteres).</small>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label>Apellidos <span class="obligatorio">*</span></label>
+      <input type="text" class="form-control" formControlName="apellidos" placeholder="Apellidos del cliente">
+      @if (form.get('apellidos')?.invalid && form.get('apellidos')?.touched) {
+      <small class="error-texto">Los apellidos son obligatorios (entre 2 y 100 caracteres).</small>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label>Correo Electrónico <span class="obligatorio">*</span></label>
+      <input type="email" class="form-control" formControlName="email" placeholder="correo@ejemplo.com">
+      @if (form.get('email')?.invalid && form.get('email')?.touched) {
+      <small class="error-texto">Ingrese un correo electrónico válido.</small>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label>Teléfono (Opcional)</label>
+      <input type="text" class="form-control" formControlName="telefono" maxlength="9" placeholder="9 dígitos">
+      @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+      <small class="error-texto">El teléfono debe tener exactamente 9 dígitos si se ingresa.</small>
+      }
+    </div>
+
+    <div class="form-grupo">
+      <label>Dirección (Opcional)</label>
+      <textarea class="form-control" formControlName="direccion" rows="2" placeholder="Dirección opcional"></textarea>
+    </div>
+
+    <div class="form-grupo checkbox-grupo">
+      <input type="checkbox" id="estadoCheck" formControlName="estado">
+      <label for="estadoCheck" style="margin-bottom: 0; cursor: pointer;">Cliente Activo</label>
+    </div>
+
+    <div class="form-acciones">
+      <button type="submit" class="btn-primario" [disabled]="cargando()">{{ isEditMode() ? 'Actualizar' : 'Guardar' }}</button>
+      <a routerLink="/clientes" class="btn-secundario">Cancelar</a>
+    </div>
+
+  </form>
+</div>
