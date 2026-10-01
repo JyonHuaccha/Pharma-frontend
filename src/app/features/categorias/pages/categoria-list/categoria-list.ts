@@ -19,10 +19,8 @@ export class CategoriaList implements OnInit {
   protected readonly cargando = signal<boolean>(true);
   protected readonly error = signal<string | null>(null);
 
-  // Señal para el buscador
   protected readonly filtroBusqueda = signal<string>('');
 
-  // Computada para filtrar las categorías en tiempo real sin recargar
   protected readonly categoriasFiltradas = computed(() => {
     const texto = this.filtroBusqueda().toLowerCase().trim();
     const lista = this.categorias();
