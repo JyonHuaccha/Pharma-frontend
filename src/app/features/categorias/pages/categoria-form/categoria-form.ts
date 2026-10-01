@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input,OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,12 +12,12 @@ import { mensajeError, erroresDeValidacion } from '../../../../core/utils/http-e
   templateUrl: './categoria-form.html',
   styleUrl: './categoria-form.css',
 })
-export class CategoriaForm implements OnInit {
+export class CategoriaForm implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly categoriaService = inject(CategoriaService);
   private readonly router = inject(Router);
+  private errorTimeout?: ReturnType<typeof setTimeout>;
 
-  // Recibe el id de la ruta automáticamente si estamos editando
   readonly id = input<string | undefined>();
 
   protected readonly form: FormGroup = this.fb.group({
@@ -47,7 +47,7 @@ export class CategoriaForm implements OnInit {
         });
       },
       error: (err) => {
-        this.errorGeneral.set(mensajeError(err));
+        this.mostrarError(mensajeError(err));
       },
     });
   }
@@ -74,10 +74,19 @@ export class CategoriaForm implements OnInit {
         this.router.navigate(['/categorias']);
       },
       error: (err) => {
-        this.errorGeneral.set(mensajeError(err));
+        this.mostrarError(mensajeError(err));
         this.erroresValidacion.set(erroresDeValidacion(err));
         this.guardando.set(false);
       },
     });
+  }
+  private mostrarError(mensaje: string, duracionMs = 3000): void {
+    clearTimeout(this.errorTimeout);
+    this.errorGeneral.set(mensaje);
+    this.errorTimeout = setTimeout(() => this.errorGeneral.set(null), duracionMs);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.errorTimeout);
   }
 }

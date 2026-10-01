@@ -4,6 +4,10 @@
     <a routerLink="nuevo" class="btn btn-primary">+ Nueva categoría</a>
   </div>
 
+  @if (errorEliminar()) {
+  <div class="alert-error">{{ errorEliminar() }}</div>
+  }
+
   <div class="buscador" style="margin-bottom: 16px; max-width: 320px;">
     <input
       type="text"
@@ -42,7 +46,7 @@
       </td>
       <td>
         <div class="acciones" style="display: flex; gap: 8px;">
-          <a [routerLink]="[cat.id, 'editar']" class="btn" style="padding: 4px 10px; font-size: 13px;">Editar</a>
+          <a [routerLink]="[cat.id, 'editar']" class="btn" style="padding: 4px 10px; font-size: 12px; background: #fef08a; border-color: #fde047; color: #854d0e;">Editar</a>
           <button type="button" class="btn btn-peligro" style="padding: 4px 10px; font-size: 13px;" (click)="eliminar(cat.id)">Eliminar</button>
         </div>
       </td>

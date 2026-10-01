@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,8 +12,10 @@ import { mensajeError } from '../../../../core/utils/http-error';
   templateUrl: './categoria-list.html',
   styleUrl: './categoria-list.css',
 })
-export class CategoriaList implements OnInit {
+export class CategoriaList implements OnInit, OnDestroy {
   private readonly categoriaService = inject(CategoriaService);
+  private errorTimeout?: ReturnType<typeof setTimeout>;
+  protected readonly errorEliminar = signal<string | null>(null); // NUEVO
 
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly cargando = signal<boolean>(true);
@@ -55,13 +57,24 @@ export class CategoriaList implements OnInit {
     if (!confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
       return;
     }
+    this.errorEliminar.set(null);
     this.categoriaService.eliminar(id).subscribe({
       next: () => {
         this.cargarCategorias();
       },
       error: (err) => {
-        alert(mensajeError(err));
+        this.mostrarErrorEliminar(mensajeError(err)); // antes: alert(...)
       },
     });
+  }
+
+  private mostrarErrorEliminar(mensaje: string, duracionMs = 3000): void {
+    clearTimeout(this.errorTimeout);
+    this.errorEliminar.set(mensaje);
+    this.errorTimeout = setTimeout(() => this.errorEliminar.set(null), duracionMs);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.errorTimeout);
   }
 }

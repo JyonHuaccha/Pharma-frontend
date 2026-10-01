@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,11 +11,12 @@ import { ClienteService } from '../../services/cliente-service';
   templateUrl: './cliente-form.html',
   styleUrls: ['./cliente-form.css'],
 })
-export class ClienteFormComponent implements OnInit {
+export class ClienteFormComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private clienteService = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private errorTimeout?: ReturnType<typeof setTimeout>;
 
   form!: FormGroup;
   isEditMode = signal<boolean>(false);
@@ -41,7 +42,6 @@ export class ClienteFormComponent implements OnInit {
       this.cargarCliente(this.clienteId);
     }
   }
-
   cargarCliente(id: number): void {
     this.cargando.set(true);
     this.clienteService.obtenerPorId(id).subscribe({
@@ -58,7 +58,7 @@ export class ClienteFormComponent implements OnInit {
         this.cargando.set(false);
       },
       error: () => {
-        this.errorMessage.set('No se pudo cargar la información del cliente.');
+        this.mostrarError('No se pudo cargar la información del cliente.');
         this.cargando.set(false);
       },
     });
@@ -94,10 +94,18 @@ export class ClienteFormComponent implements OnInit {
         this.router.navigate(['/clientes']);
       },
       error: (err) => {
-        // Muestra los mensajes de error devueltos por el backend (por ejemplo, DNI o correo duplicado - 409)
-        this.errorMessage.set(err.error?.message || 'Ocurrió un error al guardar el cliente.');
+        this.mostrarError(err.error?.message || 'Ocurrió un error al guardar el cliente.');
         this.cargando.set(false);
       },
     });
+  }
+  private mostrarError(mensaje: string, duracionMs = 3000): void {
+    clearTimeout(this.errorTimeout);
+    this.errorMessage.set(mensaje);
+    this.errorTimeout = setTimeout(() => this.errorMessage.set(null), duracionMs);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.errorTimeout);
   }
 }

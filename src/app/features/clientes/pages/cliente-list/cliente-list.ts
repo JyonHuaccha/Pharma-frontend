@@ -19,7 +19,7 @@ export class ClienteListComponent implements OnInit {
   cargando = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  paginaActual = signal<number>(0);
+  paginaActual = signal<number>(0); // base 0
   tamanioPagina = signal<number>(10);
   ordenarPor = signal<string>('apellidos');
   direccion = signal<'asc' | 'desc'>('asc');
@@ -49,10 +49,13 @@ export class ClienteListComponent implements OnInit {
   totalPaginas = computed(() =>
     Math.max(1, Math.ceil(this.totalElementos() / this.tamanioPagina())),
   );
-  esUltima = computed(() => this.paginaActual() + 1 >= this.totalPaginas());
+
+  paginaSegura = computed(() => Math.min(this.paginaActual(), this.totalPaginas() - 1));
+
+  esUltima = computed(() => this.paginaSegura() + 1 >= this.totalPaginas());
 
   clientesPagina = computed(() => {
-    const inicio = this.paginaActual() * this.tamanioPagina();
+    const inicio = this.paginaSegura() * this.tamanioPagina();
     return this.clientesFiltrados().slice(inicio, inicio + this.tamanioPagina());
   });
 
@@ -76,14 +79,19 @@ export class ClienteListComponent implements OnInit {
   }
 
   cambiarPagina(incremento: number): void {
-    const nuevaPagina = this.paginaActual() + incremento;
+    const nuevaPagina = this.paginaSegura() + incremento;
     if (nuevaPagina >= 0 && nuevaPagina < this.totalPaginas()) {
       this.paginaActual.set(nuevaPagina);
     }
   }
 
-  cambiarTamanio(event: any): void {
-    this.tamanioPagina.set(Number(event.target.value));
+  cambiarTamano(valor: string): void {
+    this.tamanioPagina.set(Number(valor));
+    this.paginaActual.set(0);
+  }
+
+  filtrar(texto: string): void {
+    this.filtroBusqueda.set(texto);
     this.paginaActual.set(0);
   }
 

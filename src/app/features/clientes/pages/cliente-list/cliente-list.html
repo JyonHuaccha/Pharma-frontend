@@ -10,7 +10,7 @@
       class="input"
       placeholder="Filtrar por DNI, nombres o apellidos..."
       [ngModel]="filtroBusqueda()"
-      (ngModelChange)="filtroBusqueda.set($event); paginaActual.set(0)"
+      (ngModelChange)="filtrar($event)"
     />
   </div>
 
@@ -49,7 +49,7 @@
           <div style="display: flex; gap: 8px;">
             <a [routerLink]="[c.id, 'editar']" class="btn" style="padding: 4px 10px; font-size: 12px; background: #fef08a; border-color: #fde047; color: #854d0e;">Editar</a>
             @if (c.estado) {
-            <button class="btn btn-peligro" style="padding: 4px 10px; font-size: 12px;" (click)="darDeBaja(c.id)">Dar de baja</button>
+            <button class="btn btn-peligro" style=" padding: 4px 10px; font-size: 12px;" (click)="darDeBaja(c.id)">Dar de baja</button>
             }
           </div>
         </td>
@@ -65,15 +65,15 @@
 
   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 14px; color: #4b5563;">
     <div>
-      <span>Página {{ paginaActual() + 1 }} de {{ totalPaginas() }} · {{ totalElementos() }} clientes</span>
+      <span>Página {{ paginaSegura() + 1 }} de {{ totalPaginas() }} · {{ totalElementos() }} clientes</span>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <select class="input" style="width: auto; padding: 6px 10px;" (change)="cambiarTamanio($event)" [value]="tamanioPagina()">
-        <option value="5">5 por pág.</option>
-        <option value="10">10 por pág.</option>
-        <option value="20">20 por pág.</option>
+      <select (change)="cambiarTamano($any($event.target).value)">
+        <option value="5" [selected]="tamanioPagina() === 5">5 por pág.</option>
+        <option value="10" [selected]="tamanioPagina() === 10">10 por pág.</option>
+        <option value="20" [selected]="tamanioPagina() === 20">20 por pág.</option>
       </select>
-      <button class="btn" [disabled]="paginaActual() === 0" (click)="cambiarPagina(-1)">Anterior</button>
+      <button class="btn" [disabled]="paginaSegura() === 0" (click)="cambiarPagina(-1)">Anterior</button>
       <button class="btn" [disabled]="esUltima()" (click)="cambiarPagina(1)">Siguiente</button>
     </div>
   </div>
