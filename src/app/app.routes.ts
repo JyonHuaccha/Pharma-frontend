@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { NoEncontrado } from './shared/pages/no-encontrado/no-encontrado';
-import { CATEGORIAS_ROUTES } from './features/categorias/categorias.routes';
-import { CLIENTES_ROUTES } from './features/clientes/cliente.routes.';
 
 export const routes: Routes = [
   {
@@ -16,12 +14,17 @@ export const routes: Routes = [
       {
         path: 'categorias',
         loadChildren: () =>
-          import('./features/categorias/categorias.routes').then((m) => CATEGORIAS_ROUTES),
+          import('./features/categorias/categorias.routes').then((m) => m.CATEGORIAS_ROUTES),
       },
       {
         path: 'clientes',
         loadChildren: () =>
-          import('./features/clientes/cliente.routes.').then((m) => CLIENTES_ROUTES),
+          import('./features/clientes/clientes.routes').then((m) => m.CLIENTES_ROUTES),
+      },
+      {
+        path: 'productos',
+        loadChildren: () =>
+          import('./features/productos/productos.routes').then((m) => m.PRODUCTOS_ROUTES),
       },
       {
         path: '',

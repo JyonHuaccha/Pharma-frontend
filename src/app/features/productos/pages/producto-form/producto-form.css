@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  background: #f1f5f9;
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 607px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+/* Tarjeta */
+.card.formulario {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 22px 22px 24px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2a52;
+}
+
+/* Etiquetas y campos */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #1e293b;
+  margin-top: 8px;
+}
+
+.req {
+  color: #0d9488; /* ajusta a #dc2626 si lo quieres rojo puro */
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #6b7280;
+}
+
+.input:focus {
+  border-color: #1a2a52;
+  box-shadow: 0 0 0 2px rgba(26, 42, 82, 0.12);
+}
+
+/* Precio y stock en dos columnas */
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Checkbox */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+}
+
+/* Botones */
+.acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: #1a2a52;
+  color: #ffffff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+/* Mensajes */
+.error {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.alerta {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.aviso {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}

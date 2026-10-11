@@ -1,0 +1,137 @@
+.page {
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filtros {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filtros .input {
+  min-width: 180px;
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tabla th {
+  background-color: #0f2e5c;
+  color: white;
+  text-align: left;
+  padding: 12px 16px;
+}
+
+.tabla td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.orden {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.orden::after {
+  content: ' ↕';
+  opacity: 0.6;
+}
+
+.chip {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e9f0f9;
+  color: #0f2e5c;
+  font-size: 13px;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.inactivo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+  color: #334155;
+}
+
+.btn-primary {
+  background: #1e293b;
+  color: white;
+  border: none;
+}
+
+.btn-peligro {
+  border-color: #fca5a5;
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.btn-peligro:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vacio {
+  text-align: center;
+  color: #6b7280;
+  padding: 24px;
+}
+
+.paginador {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 14px;
+}
