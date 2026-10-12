@@ -15,25 +15,35 @@ export class ProductoService {
     tamanio: number,
     ordenarPor: OrdenProducto,
     direccion: Direccion,
+    categoriaId?: number | null,
   ): Observable<PaginaResponse<Producto>> {
     return this.http.get<Producto[]>(this.url).pipe(
       map((lista): PaginaResponse<Producto> => {
-        const ordenada = [...lista].sort((a: any, b: any) => {
+        const filtrada =
+          categoriaId == null ? lista : lista.filter((producto) => producto.categoriaId === categoriaId);
+
+        const ordenada = [...filtrada].sort((a: Producto, b: Producto) => {
           const x = a[ordenarPor];
           const y = b[ordenarPor];
-          const r = typeof x === 'string' ? x.localeCompare(y) : x - y;
+          const r =
+            typeof x === 'string' && typeof y === 'string'
+              ? x.localeCompare(y)
+              : Number(x) - Number(y);
           return direccion === 'asc' ? r : -r;
         });
 
         const inicio = pagina * tamanio;
+        const totalElementos = ordenada.length;
+        const totalPaginas = Math.max(1, Math.ceil(totalElementos / tamanio));
+        const contenido = ordenada.slice(inicio, inicio + tamanio);
 
         return {
-          contenido: ordenada.slice(inicio, inicio + tamanio),
+          contenido,
           pagina,
           tamanio,
-          totalElementos: ordenada.length,
-          totalPaginas: Math.max(1, Math.ceil(ordenada.length / tamanio)),
-          ultima: (pagina + 1) * tamanio >= ordenada.length,
+          totalElementos,
+          totalPaginas,
+          ultima: pagina >= totalPaginas - 1,
         } as PaginaResponse<Producto>;
       }),
     );

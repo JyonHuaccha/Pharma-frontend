@@ -20,3 +20,5 @@ export interface ClienteRequest {
   direccion: string | null;
   estado: boolean;
 }
+export type OrdenCliente = 'dni' | 'apellidos' | 'email';
+export type Direccion = 'asc' | 'desc';

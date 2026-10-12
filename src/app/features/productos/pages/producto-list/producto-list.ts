@@ -17,6 +17,7 @@ import { ProductoService } from '../../services/producto-service';
 export class ProductoList implements OnInit {
   private readonly productoService = inject(ProductoService);
   private readonly categoriaService = inject(CategoriaService);
+  
   protected readonly pagina = signal(0);
   protected readonly tamanio = signal(10);
   protected readonly ordenarPor = signal<OrdenProducto>('nombre');
@@ -26,11 +27,9 @@ export class ProductoList implements OnInit {
   protected readonly categoriaFiltro = signal<number | null>(null);
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly productos = computed(() => {
-    const filtro = this.categoriaFiltro();
-    const lista = this.resultado()?.contenido ?? [];
-    return filtro === null ? lista : lista.filter((p) => p.categoriaId === filtro);
-  });
+  protected readonly categoriasActivas = computed(() => this.categorias().filter((c) => c.estado));
+  protected readonly productos = computed(() => this.resultado()?.contenido ?? []);
+
   ngOnInit(): void {
     this.categoriaService.listar().subscribe({
       next: (datos) => this.categorias.set(datos),
@@ -38,13 +37,25 @@ export class ProductoList implements OnInit {
     });
     this.cargar();
   }
+
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
     this.productoService
-      .listar(this.pagina(), this.tamanio(), this.ordenarPor(), this.direccion())
+      .listar(
+        this.pagina(),
+        this.tamanio(),
+        this.ordenarPor(),
+        this.direccion(),
+        this.categoriaFiltro(),
+      )
       .subscribe({
         next: (pagina) => {
+          if (pagina.contenido.length === 0 && this.pagina() > 0) {
+            this.pagina.set(Math.max(0, this.pagina() - 1));
+            this.cargar();
+            return;
+          }
           this.resultado.set(pagina);
           this.cargando.set(false);
         },
@@ -54,14 +65,17 @@ export class ProductoList implements OnInit {
         },
       });
   }
+
   irA(pagina: number): void {
     this.pagina.set(pagina);
     this.cargar();
   }
+
   cambiarTamanio(valor: string): void {
     this.tamanio.set(Number(valor));
     this.irA(0);
   }
+
   ordenar(campo: OrdenProducto): void {
     if (this.ordenarPor() === campo) {
       this.direccion.update((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -71,16 +85,26 @@ export class ProductoList implements OnInit {
     }
     this.irA(0);
   }
+
   filtrarPorCategoria(valor: string): void {
     this.categoriaFiltro.set(valor ? Number(valor) : null);
+    this.irA(0);
   }
-  protected readonly categoriasActivas = computed(() => this.categorias().filter((c) => c.estado));
+
   darDeBaja(producto: Producto): void {
     if (!confirm(`¿Dar de baja el producto "${producto.nombre}"?`)) {
       return;
     }
+    const paginaAntes = this.pagina();
+    const quedariaVaciaLaPagina = (this.resultado()?.contenido.length ?? 0) <= 1 && paginaAntes > 0;
+
     this.productoService.darDeBaja(producto.id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        if (quedariaVaciaLaPagina) {
+          this.pagina.set(Math.max(0, paginaAntes - 1));
+        }
+        this.cargar();
+      },
       error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
     });
   }

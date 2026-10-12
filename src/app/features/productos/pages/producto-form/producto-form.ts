@@ -28,7 +28,7 @@ export class ProductoForm implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly erroresServidor = signal<Record<string, string>>({});
   protected readonly form = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     precio: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
     stock: this.fb.control<number | null>(0, [
       Validators.required,
@@ -38,26 +38,24 @@ export class ProductoForm implements OnInit {
     estado: [true],
     categoriaId: this.fb.control<number | null>(null, Validators.required),
   });
-  /** Opciones del select: categorías activas + la que ya tenía el producto. */
   protected readonly opciones = computed(() =>
     this.categorias().filter((c) => c.estado || c.id === this.categoriaOriginal()),
   );
   protected readonly hayCategoriasActivas = computed(() => this.categorias().some((c) => c.estado));
-  /** Valor del select convertido en signal para validar la dependencia. */
   private readonly categoriaElegida = toSignal(this.form.controls.categoriaId.valueChanges, {
     initialValue: null,
   });
   protected readonly categoriaInactiva = computed(() => {
-    const elegida = this.categorias().find((c) => c.id === this.categoriaElegida());
-    return !!elegida && !elegida.estado;
-  });
+  const id = this.categoriaElegida();
+  const elegida = this.categorias().find((c) => c.id === id);
+  return !!elegida && !elegida.estado && id !== this.categoriaOriginal();
+});
   protected esEdicion(): boolean {
     return !!this.id();
   }
   ngOnInit(): void {
     const id = this.id();
     if (id) {
-      // Categorías y producto se piden en paralelo; se continúa cuando llegan ambos.
       forkJoin({
         categorias: this.categoriaService.listar(),
         producto: this.productoService.obtener(Number(id)),
@@ -87,6 +85,9 @@ export class ProductoForm implements OnInit {
     }
   }
   guardar(): void {
+    this.error.set(null);
+    this.erroresServidor.set({});
+
     if (this.form.invalid || this.categoriaInactiva()) {
       this.form.markAllAsTouched();
       return;

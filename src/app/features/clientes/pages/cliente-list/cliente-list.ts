@@ -1,119 +1,93 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { PaginaResponse } from '../../../../core/models/pagina-response';
+import { mensajeError } from '../../../../core/utils/http-error';
+import { Cliente, Direccion, OrdenCliente } from '../../models/cliente.model';
 import { ClienteService } from '../../services/cliente-service';
-import { Cliente } from '../../models/cliente.model';
 
 @Component({
   selector: 'app-cliente-list',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './cliente-list.html',
-  styleUrls: ['./cliente-list.css'],
+  styleUrl: './cliente-list.css',
 })
 export class ClienteListComponent implements OnInit {
-  private clienteService = inject(ClienteService);
+  private readonly clienteService = inject(ClienteService);
 
-  clientes = signal<Cliente[]>([]);
-  cargando = signal<boolean>(false);
-  error = signal<string | null>(null);
-
-  paginaActual = signal<number>(0); // base 0
-  tamanioPagina = signal<number>(10);
-  ordenarPor = signal<string>('apellidos');
-  direccion = signal<'asc' | 'desc'>('asc');
-
-  filtroBusqueda = signal<string>('');
-
-  clientesFiltrados = computed(() => {
-    const texto = this.filtroBusqueda().toLowerCase().trim();
-    let lista = this.clientes();
-    if (texto) {
-      lista = lista.filter(
-        (c) =>
-          c.dni.toLowerCase().includes(texto) ||
-          c.nombres.toLowerCase().includes(texto) ||
-          c.apellidos.toLowerCase().includes(texto) ||
-          `${c.nombres} ${c.apellidos}`.toLowerCase().includes(texto),
-      );
-    }
-    const campo = this.ordenarPor() as keyof Cliente;
-    const factor = this.direccion() === 'asc' ? 1 : -1;
-    return [...lista].sort(
-      (a, b) => String(a[campo] ?? '').localeCompare(String(b[campo] ?? '')) * factor,
-    );
-  });
-
-  totalElementos = computed(() => this.clientesFiltrados().length);
-  totalPaginas = computed(() =>
-    Math.max(1, Math.ceil(this.totalElementos() / this.tamanioPagina())),
-  );
-
-  paginaSegura = computed(() => Math.min(this.paginaActual(), this.totalPaginas() - 1));
-
-  esUltima = computed(() => this.paginaSegura() + 1 >= this.totalPaginas());
-
-  clientesPagina = computed(() => {
-    const inicio = this.paginaSegura() * this.tamanioPagina();
-    return this.clientesFiltrados().slice(inicio, inicio + this.tamanioPagina());
-  });
+  protected readonly pagina = signal(0);
+  protected readonly tamanio = signal(10);
+  protected readonly ordenarPor = signal<OrdenCliente>('apellidos');
+  protected readonly direccion = signal<Direccion>('asc');
+  protected readonly texto = signal('');
+  protected readonly resultado = signal<PaginaResponse<Cliente> | null>(null);
+  protected readonly cargando = signal(false);
+  protected readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.cargarClientes();
+    this.cargar();
   }
 
-  cargarClientes(): void {
+   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.clienteService.listar().subscribe({
-      next: (resp) => {
-        this.clientes.set(resp);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.error.set('No se pudo cargar el listado de clientes.');
-        this.cargando.set(false);
-      },
-    });
+    this.clienteService
+      .listarPagina(
+        this.pagina(),
+        this.tamanio(),
+        this.ordenarPor(),
+        this.direccion(),
+        this.texto(),
+      )
+      .subscribe({
+        next: (pagina) => {
+          if (pagina.contenido.length === 0 && this.pagina() > 0) {
+            this.pagina.set(Math.max(0, this.pagina() - 1));
+            this.cargar();
+            return;
+          }
+          this.resultado.set(pagina);
+          this.cargando.set(false);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error.set(mensajeError(err));
+          this.cargando.set(false);
+        },
+      });
   }
 
-  cambiarPagina(incremento: number): void {
-    const nuevaPagina = this.paginaSegura() + incremento;
-    if (nuevaPagina >= 0 && nuevaPagina < this.totalPaginas()) {
-      this.paginaActual.set(nuevaPagina);
-    }
+  irA(pagina: number): void {
+    this.pagina.set(pagina);
+    this.cargar();
   }
 
-  cambiarTamano(valor: string): void {
-    this.tamanioPagina.set(Number(valor));
-    this.paginaActual.set(0);
+  cambiarTamanio(valor: string): void {
+    this.tamanio.set(Number(valor));
+    this.irA(0);
   }
 
-  filtrar(texto: string): void {
-    this.filtroBusqueda.set(texto);
-    this.paginaActual.set(0);
-  }
-
-  ordenar(campo: string): void {
+  ordenar(campo: OrdenCliente): void {
     if (this.ordenarPor() === campo) {
-      this.direccion.set(this.direccion() === 'asc' ? 'desc' : 'asc');
+      this.direccion.update((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
       this.ordenarPor.set(campo);
       this.direccion.set('asc');
     }
+    this.irA(0);
   }
 
-  darDeBaja(id: number): void {
-    if (confirm('¿Estás seguro de dar de baja a este cliente?')) {
-      this.clienteService.darDeBaja(id).subscribe({
-        next: () => {
-          this.cargarClientes();
-        },
-        error: (err) => {
-          alert(err.error?.message || 'Error al dar de baja al cliente.');
-        },
-      });
+  buscar(valor: string): void {
+    this.texto.set(valor);
+    this.irA(0);
+  }
+
+  darDeBaja(cliente: Cliente): void {
+    if (!confirm(`¿Dar de baja al cliente "${cliente.nombres} ${cliente.apellidos}"?`)) {
+      return;
     }
+    this.clienteService.darDeBaja(cliente.id).subscribe({
+      next: () => this.cargar(),
+      error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
+    });
   }
 }
