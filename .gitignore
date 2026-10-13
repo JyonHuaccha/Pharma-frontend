@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Local verification output
+/docs/autonoma-s9/
+/docs/evidencias/
+/docs/*_materiales.zip

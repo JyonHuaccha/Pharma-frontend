@@ -1,62 +1,68 @@
-<div class="card">
-  <div class="page-header">
-    <h2>Categorías</h2>
+<section class="page">
+  <header class="page-header">
+    <div><h2>Categorías</h2><p class="subtitulo">Administra tus categorías y su estado.</p></div>
     <a routerLink="nuevo" class="btn btn-primary">+ Nueva categoría</a>
+  </header>
+  <div class="filtros">
+    <label>
+      Buscar
+      <input type="text" class="input" placeholder="Nombre o descripción"
+             [value]="texto()" (input)="buscar($any($event.target).value)" />
+    </label>
+    <label>
+      Por página
+      <select class="input" [value]="tamanio()"
+              (change)="cambiarTamanio($any($event.target).value)">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+      </select>
+    </label>
   </div>
-
-  @if (errorEliminar()) {
-  <div class="alert-error">{{ errorEliminar() }}</div>
-  }
-
-  <div class="buscador" style="margin-bottom: 16px; max-width: 320px;">
-    <input
-      type="text"
-      class="input"
-      placeholder="Buscar por nombre..."
-      [value]="filtroBusqueda()"
-      (input)="filtroBusqueda.set($any($event.target).value)"
-    />
-  </div>
-
-  @if (cargando()) {
-  <p>Cargando categorías...</p>
-  } @else if (error()) {
+  @if (error()) {
   <div class="alerta">{{ error() }}</div>
-  } @else {
-  <table class="tabla">
+  }
+  @if (cargando() && !resultado()) {
+  <p>Cargando categorías...</p>
+  }
+  @if (resultado(); as r) {
+  <div class="tabla-contenedor"><table class="tabla">
     <thead>
     <tr>
-      <th>ID</th>
-      <th>Nombre</th>
-      <th>Descripción</th>
-      <th>Estado</th>
+      <th [attr.aria-sort]="ordenarPor() === 'id' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('id')">ID <span aria-hidden="true">{{ ordenarPor() === 'id' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'nombre' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('nombre')">Nombre <span aria-hidden="true">{{ ordenarPor() === 'nombre' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'descripcion' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('descripcion')">Descripción <span aria-hidden="true">{{ ordenarPor() === 'descripcion' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'estado' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('estado')">Estado <span aria-hidden="true">{{ ordenarPor() === 'estado' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
       <th>Acciones</th>
     </tr>
     </thead>
     <tbody>
-    @for (cat of categoriasFiltradas(); track cat.id) {
+    @for (c of r.contenido; track c.id) {
     <tr>
-      <td>{{ cat.id }}</td>
-      <td>{{ cat.nombre }}</td>
-      <td>{{ cat.descripcion || '—' }}</td>
+      <td>{{ c.id }}</td>
+      <td>{{ c.nombre }}</td>
+      <td>{{ c.descripcion || '—' }}</td>
       <td>
-              <span class="badge" [class.inactivo]="!cat.estado">
-                {{ cat.estado ? 'Activo' : 'Inactivo' }}
-              </span>
+        <span class="badge" [class.inactivo]="!c.estado">{{ c.estado ? 'Activo' : 'Inactivo' }}</span>
       </td>
-      <td>
-        <div class="acciones" style="display: flex; gap: 8px;">
-          <a [routerLink]="[cat.id, 'editar']" class="btn" style="padding: 4px 10px; font-size: 12px; background: #fef08a; border-color: #fde047; color: #854d0e;">Editar</a>
-          <button type="button" class="btn btn-peligro" style="padding: 4px 10px; font-size: 13px;" (click)="eliminar(cat.id)">Eliminar</button>
-        </div>
+      <td class="acciones">
+        <a routerLink="/productos" [queryParams]="{ categoriaId: c.id }" class="btn">Ver productos</a>
+        <a [routerLink]="[c.id, 'editar']" class="btn">Editar</a>
+        <button type="button" class="btn btn-peligro" [disabled]="!c.estado || eliminando()"
+                (click)="darDeBaja(c)">
+          Dar de baja
+        </button>
       </td>
     </tr>
     } @empty {
-    <tr>
-      <td colspan="5" class="vacio" style="text-align: center; color: #6b7280; padding: 24px;">No se encontraron categorías.</td>
-    </tr>
+    <tr><td colspan="5" class="vacio">No hay categorías para mostrar.</td></tr>
     }
     </tbody>
-  </table>
+  </table></div>
+  <footer class="paginador">
+    <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas }} · {{ r.totalElementos }} categorías</span>
+    <button type="button" class="btn" [disabled]="r.pagina === 0 || cargando()" (click)="irA(r.pagina - 1)">Anterior</button>
+    <button type="button" class="btn" [disabled]="r.ultima || cargando()" (click)="irA(r.pagina + 1)">Siguiente</button>
+  </footer>
   }
-</div>
+</section>

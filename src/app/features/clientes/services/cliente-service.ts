@@ -1,3 +1,5 @@
+import { paginar } from '../../../core/utils/paginar';
+import { coincide } from '../../../core/utils/textos';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
@@ -9,11 +11,17 @@ import { Cliente, ClienteRequest, Direccion, OrdenCliente } from '../models/clie
   providedIn: 'root',
 })
 export class ClienteService {
-  private http = inject(HttpClient);
-  private url = `${environment.apiUrl}/clientes`;
-
-  listar(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.url);
+private readonly http = inject(HttpClient);
+private readonly url = `${environment.apiUrl}/clientes`;
+listarTodos(): Observable<Cliente[]> {
+  return this.http.get<Cliente[]>(this.url);
+}
+listar(pagina = 0, tamanio = 20, ordenarPor = 'apellidos',
+direccion: 'asc' | 'desc' = 'asc'): Observable<PaginaResponse<Cliente>> {
+return this.listarPagina(pagina, tamanio, ordenarPor as OrdenCliente, direccion);
+}
+ obtener(id: number): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.url}/${id}`);
   }
 
   listarPagina(
@@ -25,34 +33,14 @@ export class ClienteService {
   ): Observable<PaginaResponse<Cliente>> {
     return this.http.get<Cliente[]>(this.url).pipe(
       map((lista): PaginaResponse<Cliente> => {
-        const t = texto.toLowerCase().trim();
-        const filtrada = t
-          ? lista.filter(
-              (c) =>
-                c.dni.toLowerCase().includes(t) ||
-                c.nombres.toLowerCase().includes(t) ||
-                c.apellidos.toLowerCase().includes(t) ||
-                `${c.nombres} ${c.apellidos}`.toLowerCase().includes(t),
-            )
-          : lista;
+        const filtrada = lista.filter(c => coincide(texto, c.dni, c.nombres, c.apellidos));
 
         const ordenada = [...filtrada].sort((a, b) => {
-          const r = String(a[ordenarPor] ?? '').localeCompare(String(b[ordenarPor] ?? ''));
-          return direccion === 'asc' ? r : -r;
+          const r = String(a[ordenarPor] ?? '').localeCompare(String(b[ordenarPor] ?? ''), 'es', { sensitivity: 'base' });
+          return (direccion === 'asc' ? r : -r) || a.id - b.id;
         });
 
-        const totalPaginas = Math.max(1, Math.ceil(ordenada.length / tamanio));
-        const paginaSegura = Math.min(pagina, totalPaginas - 1);
-        const inicio = paginaSegura * tamanio;
-
-        return {
-          contenido: ordenada.slice(inicio, inicio + tamanio),
-          pagina: paginaSegura,
-          tamanio,
-          totalElementos: ordenada.length,
-          totalPaginas,
-          ultima: paginaSegura + 1 >= totalPaginas,
-        };
+        return paginar(ordenada, pagina, tamanio);
       }),
     );
   }

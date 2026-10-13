@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
@@ -17,7 +17,8 @@ import { ProductoService } from '../../services/producto-service';
 export class ProductoList implements OnInit {
   private readonly productoService = inject(ProductoService);
   private readonly categoriaService = inject(CategoriaService);
-  
+  readonly categoriaId = input<string>();
+
   protected readonly pagina = signal(0);
   protected readonly tamanio = signal(10);
   protected readonly ordenarPor = signal<OrdenProducto>('nombre');
@@ -25,12 +26,25 @@ export class ProductoList implements OnInit {
   protected readonly resultado = signal<PaginaResponse<Producto> | null>(null);
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly categoriaFiltro = signal<number | null>(null);
+  protected readonly desdeCategoria = signal(false);
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly categoriasActivas = computed(() => this.categorias().filter((c) => c.estado));
+  protected readonly opcionesFiltro = computed(() => {
+    const filtro = this.categoriaFiltro();
+    return this.categorias().filter((c) => c.estado || c.id === filtro);
+  });
+  protected readonly nombreCategoriaFiltro = computed(
+    () => this.categorias().find((c) => c.id === this.categoriaFiltro())?.nombre ?? null,
+  );
   protected readonly productos = computed(() => this.resultado()?.contenido ?? []);
 
   ngOnInit(): void {
+        const id = Number(this.categoriaId());
+    if (this.categoriaId() && Number.isInteger(id) && id > 0) {
+      this.categoriaFiltro.set(id);
+      this.tamanio.set(100);
+      this.desdeCategoria.set(true);
+    }
     this.categoriaService.listar().subscribe({
       next: (datos) => this.categorias.set(datos),
       error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),

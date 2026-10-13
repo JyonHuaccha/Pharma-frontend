@@ -10,6 +10,10 @@ export class ProductoService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/productos`;
 
+  listarTodos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.url);
+  }
+
   listar(
     pagina: number,
     tamanio: number,

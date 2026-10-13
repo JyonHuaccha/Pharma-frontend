@@ -135,3 +135,11 @@
   margin-top: 16px;
   font-size: 14px;
 }
+.nota {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #e9f0f9;
+  color: #0f2e5c;
+  font-size: 14px;
+}

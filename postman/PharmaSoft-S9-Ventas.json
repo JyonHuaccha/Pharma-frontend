@@ -1,0 +1,803 @@
+{
+  "info": {
+    "name": "PharmaSoft - S9 Ventas",
+    "description": "Actividad autónoma S9. Incluye peticiones de comprobación y datos sintéticos locales. Los POST válidos crean ventas y consumen stock. Revisa las variables antes de ejecutar; no uses datos reales.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "clienteActivoId",
+      "value": "31",
+      "type": "string"
+    },
+    {
+      "key": "clienteInactivoId",
+      "value": "34",
+      "type": "string"
+    },
+    {
+      "key": "producto1250Id",
+      "value": "39",
+      "type": "string"
+    },
+    {
+      "key": "producto1890Id",
+      "value": "40",
+      "type": "string"
+    },
+    {
+      "key": "producto525Id",
+      "value": "41",
+      "type": "string"
+    },
+    {
+      "key": "productoCentavoId",
+      "value": "42",
+      "type": "string"
+    },
+    {
+      "key": "productoStock2Id",
+      "value": "43",
+      "type": "string"
+    },
+    {
+      "key": "productoRepetidoId",
+      "value": "46",
+      "type": "string"
+    },
+    {
+      "key": "categoriaStock2Id",
+      "value": "94",
+      "type": "string"
+    },
+    {
+      "key": "ventaId",
+      "value": "13",
+      "type": "string"
+    },
+    {
+      "key": "ventaAnuladaId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "desde",
+      "value": "2026-10-12",
+      "type": "string"
+    },
+    {
+      "key": "hasta",
+      "value": "2026-10-12",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Preparación consultar clientes",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/clientes",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Preparación consultar productos",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C-01 cálculo en el servidor",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "Crea una venta de prueba; consume stock del producto sintético.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": 3 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Total 37.5\", () => pm.expect(pm.response.json().total).to.eql(37.5));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C-02 cálculo en el servidor",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "Crea una venta de prueba; consume stock del producto sintético.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1890Id}}, \"cantidad\": 3 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Total 56.7\", () => pm.expect(pm.response.json().total).to.eql(56.7));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C-05 cálculo en el servidor",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "Crea una venta de prueba; consume stock del producto sintético.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{productoCentavoId}}, \"cantidad\": 3 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Total 0.3\", () => pm.expect(pm.response.json().total).to.eql(0.3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C-04 registrar Alfa y Gamma",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "Registra la venta sin la línea del medio.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": 2 },\n    { \"productoId\": {{producto525Id}}, \"cantidad\": 4 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Total y dos ítems\", () => { const r=pm.response.json(); pm.expect(r.total).to.eql(46); pm.expect(r.detalles.length).to.eql(2); pm.collectionVariables.set(\"ventaId\", r.id); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-01 venta vacía",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"clienteId\":null,\"detalles\":[]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-02 cantidad cero",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": 0 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-02 cantidad decimal",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": 2.5 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-03 supera stock 2",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "Ejecutar cuando el producto sintético Ultimo tiene stock 2.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{productoStock2Id}}, \"cantidad\": 3 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-05 producto repetido",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{productoRepetidoId}}, \"cantidad\": 1 },\n    { \"productoId\": {{productoRepetidoId}}, \"cantidad\": 2 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V-06 cantidad negativa",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": -1 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "M-02 cliente inactivo",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteInactivoId}},\n  \"detalles\": [\n    { \"productoId\": {{producto1250Id}}, \"cantidad\": 1 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "M-01 preparar Ultimo con stock 2",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/productos/{{productoStock2Id}}",
+        "description": "Modifica exclusivamente el producto sintético Ultimo para repetir la prueba.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"S9A 12082622 Ultimo\",\n  \"precio\": 7.8,\n  \"stock\": 2,\n  \"categoriaId\": 94,\n  \"estado\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "M-01 primera venta de dos unidades",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{productoStock2Id}}, \"cantidad\": 2 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "M-01 segundo intento sin stock",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/ventas",
+        "description": "",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": {{clienteActivoId}},\n  \"detalles\": [\n    { \"productoId\": {{productoStock2Id}}, \"cantidad\": 2 }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "X-01 obtener venta registrada",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/ventas/{{ventaId}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "X-01 consultar stock de Alfa",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos/{{producto1250Id}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "X-01 consultar stock de Gamma",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/productos/{{producto525Id}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "I-01 consultar venta anulada",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/ventas/{{ventaAnuladaId}}",
+        "description": "Solo lectura; confirma el estado antes de utilizarla en la captura manual de impresión.",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-01 reporte histórico",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Contrato del reporte\", () => { pm.response.json().forEach(r => pm.expect(r).to.have.all.keys(\"categoriaId\",\"categoriaNombre\",\"cantidadVendida\",\"montoTotal\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-02 reporte desde una fecha",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria?desde={{desde}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-02 reporte hasta una fecha",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria?hasta={{hasta}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-02 reporte en un periodo",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria?desde={{desde}}&hasta={{hasta}}",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-03 rango inválido",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria?desde=2026-10-13&hasta=2026-10-12",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "R-04 periodo vacío",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/reportes/ventas-por-categoria?desde=1900-01-01&hasta=1900-01-02",
+        "description": "",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Sin ventas\", () => pm.expect(pm.response.json()).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

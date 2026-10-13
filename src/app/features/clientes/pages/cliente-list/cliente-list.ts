@@ -1,4 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Avisos } from '../../../../core/services/avisos';
+import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { PaginaResponse } from '../../../../core/models/pagina-response';
@@ -13,6 +16,10 @@ import { ClienteService } from '../../services/cliente-service';
   styleUrl: './cliente-list.css',
 })
 export class ClienteListComponent implements OnInit {
+  private readonly avisos = inject(Avisos);
+  private readonly destroyRef = inject(DestroyRef);
+  private carga?: Subscription;
+  protected readonly eliminando = signal(false);
   private readonly clienteService = inject(ClienteService);
 
   protected readonly pagina = signal(0);
@@ -29,9 +36,10 @@ export class ClienteListComponent implements OnInit {
   }
 
    cargar(): void {
+    this.carga?.unsubscribe();
     this.cargando.set(true);
     this.error.set(null);
-    this.clienteService
+    this.carga = this.clienteService
       .listarPagina(
         this.pagina(),
         this.tamanio(),
@@ -39,13 +47,10 @@ export class ClienteListComponent implements OnInit {
         this.direccion(),
         this.texto(),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (pagina) => {
-          if (pagina.contenido.length === 0 && this.pagina() > 0) {
-            this.pagina.set(Math.max(0, this.pagina() - 1));
-            this.cargar();
-            return;
-          }
+          this.pagina.set(pagina.pagina);
           this.resultado.set(pagina);
           this.cargando.set(false);
         },
@@ -81,13 +86,21 @@ export class ClienteListComponent implements OnInit {
     this.irA(0);
   }
 
-  darDeBaja(cliente: Cliente): void {
-    if (!confirm(`¿Dar de baja al cliente "${cliente.nombres} ${cliente.apellidos}"?`)) {
-      return;
-    }
-    this.clienteService.darDeBaja(cliente.id).subscribe({
-      next: () => this.cargar(),
-      error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
+  async darDeBaja(cliente: Cliente): Promise<void> {
+    if (this.eliminando() || !cliente.estado) return;
+    if (!await this.avisos.confirmar('Dar de baja al cliente',
+      `¿Deseas dar de baja a ${cliente.nombres} ${cliente.apellidos}? El registro se conservará como inactivo.`, 'Dar de baja')) return;
+    this.eliminando.set(true);
+    this.clienteService.darDeBaja(cliente.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.eliminando.set(false);
+        this.avisos.mostrar('Cliente dado de baja correctamente.');
+        this.cargar();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.eliminando.set(false);
+        this.avisos.mostrar(mensajeError(err), 'error');
+      },
     });
   }
 }

@@ -1,0 +1,32 @@
+<section class="reporte">
+  <header>
+    <span class="etiqueta">REPORTES</span>
+    <h2>Ventas por categoría</h2>
+    <p>Compara las unidades vendidas y el monto de las ventas registradas.</p>
+  </header>
+  <form [formGroup]="filtros" (ngSubmit)="generar()" class="filtros">
+    <label for="reporte-desde">Desde<input id="reporte-desde" type="date" formControlName="desde" /></label>
+    <label for="reporte-hasta">Hasta<input id="reporte-hasta" type="date" formControlName="hasta" /></label>
+    <div class="botones"><button type="button" (click)="limpiar()" [disabled]="cargando()">Limpiar</button><button type="submit" class="primario" [disabled]="cargando()">{{ cargando() ? 'Generando…' : 'Generar' }}</button></div>
+    <span class="ayuda">Deja las fechas vacías para consultar el histórico.</span>
+  </form>
+  @if (errorFechas()) { <p class="alerta" role="alert">{{ errorFechas() }}</p> }
+  @if (cargando()) {
+    <div class="estado" role="status"><span class="indicador" aria-hidden="true"></span><p>Generando reporte de ventas…</p></div>
+  } @else if (error()) {
+    <div class="estado error" role="alert"><h3>No se pudo generar el reporte</h3><p>{{ error() }}</p><button type="button" (click)="generar()">Reintentar</button></div>
+  } @else if (filas().length === 0) {
+    <div class="estado" role="status"><h3>No hay ventas en el periodo seleccionado</h3><p>Selecciona otro periodo o consulta el histórico.</p></div>
+  } @else {
+    <div class="resumen"><div><span>Unidades vendidas</span><strong>{{ totalUnidades() | number:'1.0-0' }}</strong></div><div><span>Monto general</span><strong>{{ totalMonto() | currency:'PEN':'S/ ' }}</strong></div><div><span>Categorías con ventas</span><strong>{{ filas().length }}</strong></div></div>
+    <p class="periodo">{{ periodo() }} · Solo ventas registradas</p>
+    <div class="tabla-contenedor"><table>
+      <caption class="sr-only">Ventas por categoría para {{ periodo() }}</caption>
+      <thead><tr><th scope="col">Categoría</th><th scope="col" class="numero">Unidades vendidas</th><th scope="col" class="numero">Monto total</th><th scope="col">Comparación con el monto mayor</th></tr></thead>
+      <tbody>@for (fila of filas(); track fila.categoriaId) {
+        <tr><th scope="row">{{ fila.categoriaNombre }}</th><td class="numero">{{ fila.cantidadVendida | number:'1.0-0' }}</td><td class="numero">{{ fila.montoTotal | currency:'PEN':'S/ ' }}</td><td><div class="comparacion"><div class="barra-fondo" aria-hidden="true"><div class="barra" [style.width.%]="porcentaje(fila.montoTotal)"></div></div><span>{{ porcentaje(fila.montoTotal) | number:'1.0-1' }} %</span></div></td></tr>
+      }</tbody>
+      <tfoot><tr><th scope="row">Total general</th><td class="numero">{{ totalUnidades() | number:'1.0-0' }}</td><td class="numero">{{ totalMonto() | currency:'PEN':'S/ ' }}</td><td>Referencia: la mayor categoría representa 100 %.</td></tr></tfoot>
+    </table></div>
+  }
+</section>

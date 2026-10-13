@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Avisos } from '../../../../core/services/avisos';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,12 +12,12 @@ import { ClienteService } from '../../services/cliente-service';
   templateUrl: './cliente-form.html',
   styleUrls: ['./cliente-form.css'],
 })
-export class ClienteFormComponent implements OnInit, OnDestroy {
+export class ClienteFormComponent implements OnInit {
+  private readonly avisos = inject(Avisos);
   private fb = inject(FormBuilder);
   private clienteService = inject(ClienteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private errorTimeout?: ReturnType<typeof setTimeout>;
 
   form!: FormGroup;
   isEditMode = signal<boolean>(false);
@@ -64,11 +65,14 @@ export class ClienteFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
+    if (this.cargando()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
+    if (!await this.avisos.confirmar('Guardar cliente', '¿Deseas guardar los cambios realizados?')) return;
 
     const val = this.form.value;
     const clienteRequest = {
@@ -91,6 +95,7 @@ export class ClienteFormComponent implements OnInit, OnDestroy {
 
     peticion.subscribe({
       next: () => {
+        this.avisos.mostrar('Cliente guardado correctamente.');
         this.router.navigate(['/clientes']);
       },
       error: (err) => {
@@ -99,13 +104,8 @@ export class ClienteFormComponent implements OnInit, OnDestroy {
       },
     });
   }
-  private mostrarError(mensaje: string, duracionMs = 3000): void {
-    clearTimeout(this.errorTimeout);
-    this.errorMessage.set(mensaje);
-    this.errorTimeout = setTimeout(() => this.errorMessage.set(null), duracionMs);
+  private mostrarError(mensaje: string): void {
+    this.avisos.mostrar(mensaje, 'error');
   }
 
-  ngOnDestroy(): void {
-    clearTimeout(this.errorTimeout);
-  }
 }

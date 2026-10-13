@@ -8,6 +8,10 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       {
+        path: 'reportes',
+        loadChildren: () => import('./features/reportes/reportes.routes').then(m => m.REPORTES_ROUTES),
+      },
+      {
         path: 'inicio',
         loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
       },
@@ -31,6 +35,11 @@ export const routes: Routes = [
         redirectTo: 'inicio',
         pathMatch: 'full',
       },
+      {
+       path: 'ventas',
+       loadChildren: () =>
+        import('./features/ventas/ventas.routes').then(m => m.VENTAS_ROUTES),
+     },
     ],
   },
   {

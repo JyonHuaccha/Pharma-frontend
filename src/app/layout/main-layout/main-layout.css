@@ -9,3 +9,10 @@
   padding: 24px;
   overflow-y: auto;
 }
+/* Al imprimir solo queda el contenido de la página: sin cabecera ni menú. */
+@media print {
+  :host { height: auto; overflow: visible; }
+  .layout-body { display: block; height: auto; }
+  .contenido { padding: 0; background: #fff; overflow: visible; }
+  app-header, app-sidebar { display: none; }
+}

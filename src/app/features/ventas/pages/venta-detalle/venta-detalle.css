@@ -1,0 +1,46 @@
+:host { display: block; color: #1f2937; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.page { max-width: 980px; margin: 0 auto; padding: 20px; }
+.comprobante { position: relative; max-width: 760px; margin: 0 auto; overflow: hidden; padding: 24px; border: 1px solid #dbe3ed; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgb(15 46 92 / 8%); }
+.negocio { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 3px solid #f2a900; }
+.negocio div { display: flex; flex-direction: column; gap: 3px; }
+.marca { color: #0f2e5c; font-size: 22px; }
+.negocio span { color: #4b5563; font-size: 14px; }
+.numero { align-items: flex-end; text-align: right; }
+.numero strong { color: #0f2e5c; font-size: 20px; }
+.datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 16px; margin: 0 0 18px; }
+.datos dt { color: #6b7280; font-size: 12px; text-transform: uppercase; }
+.datos dd { margin: 3px 0 0; font-weight: 600; }
+.tabla-contenedor { overflow-x: auto; }
+.tabla { width: 100%; min-width: 560px; border-collapse: collapse; }
+.tabla th { padding: 10px 12px; background: #0f2e5c; color: #fff; font-size: 14px; text-align: left; }
+.tabla td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+.tabla tfoot td { border-top: 2px solid #cbd5e1; border-bottom: 0; }
+.monto { text-align: right; white-space: nowrap; }
+.total { color: #0f2e5c; font-size: 18px; font-weight: 700; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 600; }
+.badge.inactivo { background: #fee2e2; color: #991b1b; }
+.exito { margin-bottom: 16px; padding: 12px 16px; border-radius: 6px; background: #dcfce7; color: #166534; }
+.acciones { position: relative; z-index: 1; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.btn { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #334155; cursor: pointer; font: inherit; text-decoration: none; }
+.btn-primary { border-color: #0f2e5c; background: #0f2e5c; color: #fff; }
+.btn-primary:hover { background: #193d78; }
+.sello { position: absolute; z-index: 0; top: 40%; left: 50%; margin: 0; transform: translate(-50%, -50%) rotate(-18deg); color: rgb(180 35 24 / 18%); font-size: 64px; font-weight: 800; pointer-events: none; }
+.negocio, .datos, .tabla-contenedor, .pie { position: relative; z-index: 1; }
+.pie { margin-top: 24px; color: #4b5563; font-size: 12px; text-align: center; }
+.pie p { margin: 2px 0; }
+
+@media (max-width: 600px) {
+  .page { padding: 12px; }
+  .comprobante { padding: 16px; }
+  .negocio { flex-wrap: wrap; }
+  .numero { align-items: flex-start; text-align: left; }
+  .sello { font-size: 46px; }
+  .acciones { justify-content: stretch; }
+  .acciones .btn { flex: 1; }
+}
+
+@media print {
+  .page { max-width: none; padding: 0; }
+  .comprobante { max-width: none; border: 0; border-radius: 0; box-shadow: none; }
+  .tabla { min-width: 0; }
+}

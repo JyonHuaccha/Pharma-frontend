@@ -1,4 +1,5 @@
-import { Component, inject, input,OnDestroy, OnInit, signal } from '@angular/core';
+import { Avisos } from '../../../../core/services/avisos';
+import { Component, inject, input,OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,11 +13,11 @@ import { mensajeError, erroresDeValidacion } from '../../../../core/utils/http-e
   templateUrl: './categoria-form.html',
   styleUrl: './categoria-form.css',
 })
-export class CategoriaForm implements OnInit, OnDestroy {
+export class CategoriaForm implements OnInit {
+  private readonly avisos = inject(Avisos);
   private readonly fb = inject(FormBuilder);
   private readonly categoriaService = inject(CategoriaService);
   private readonly router = inject(Router);
-  private errorTimeout?: ReturnType<typeof setTimeout>;
 
   readonly id = input<string | undefined>();
 
@@ -52,11 +53,14 @@ export class CategoriaForm implements OnInit, OnDestroy {
     });
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
+    if (this.guardando()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
+    if (!await this.avisos.confirmar('Guardar categoría', '¿Deseas guardar los cambios realizados?')) return;
 
     this.guardando.set(true);
     this.errorGeneral.set(null);
@@ -71,6 +75,7 @@ export class CategoriaForm implements OnInit, OnDestroy {
 
     operacion.subscribe({
       next: () => {
+        this.avisos.mostrar('Categoría guardada correctamente.');
         this.router.navigate(['/categorias']);
       },
       error: (err) => {
@@ -80,13 +85,8 @@ export class CategoriaForm implements OnInit, OnDestroy {
       },
     });
   }
-  private mostrarError(mensaje: string, duracionMs = 3000): void {
-    clearTimeout(this.errorTimeout);
-    this.errorGeneral.set(mensaje);
-    this.errorTimeout = setTimeout(() => this.errorGeneral.set(null), duracionMs);
+  private mostrarError(mensaje: string): void {
+    this.avisos.mostrar(mensaje, 'error');
   }
 
-  ngOnDestroy(): void {
-    clearTimeout(this.errorTimeout);
-  }
 }

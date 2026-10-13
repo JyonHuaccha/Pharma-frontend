@@ -1,6 +1,6 @@
 <section class="page">
   <header class="page-header">
-    <h2>Clientes</h2>
+    <div><h2>Clientes</h2><p class="subtitulo">Administra tus clientes y su estado.</p></div>
     <a routerLink="nuevo" class="btn btn-primary">+ Nuevo cliente</a>
   </header>
   <div class="filtros">
@@ -26,15 +26,12 @@
   <p>Cargando clientes...</p>
   }
   @if (resultado(); as r) {
-  <table class="tabla">
+  <div class="tabla-contenedor"><table class="tabla">
     <thead>
     <tr>
-      <th><button type="button" class="orden"
-                  (click)="ordenar('dni')">DNI</button></th>
-      <th><button type="button" class="orden"
-                  (click)="ordenar('apellidos')">Apellidos y nombres</button></th>
-      <th><button type="button" class="orden"
-                  (click)="ordenar('email')">Correo</button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'dni' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('dni')">DNI <span aria-hidden="true">{{ ordenarPor() === 'dni' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'apellidos' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('apellidos')">Apellidos y nombres <span aria-hidden="true">{{ ordenarPor() === 'apellidos' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
+      <th [attr.aria-sort]="ordenarPor() === 'email' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('email')">Correo <span aria-hidden="true">{{ ordenarPor() === 'email' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
       <th>Teléfono</th>
       <th>Estado</th>
       <th>Acciones</th>
@@ -52,7 +49,7 @@
       </td>
       <td class="acciones">
         <a [routerLink]="[c.id, 'editar']" class="btn">Editar</a>
-        <button type="button" class="btn btn-peligro" [disabled]="!c.estado"
+        <button type="button" class="btn btn-peligro" [disabled]="!c.estado || eliminando()"
                 (click)="darDeBaja(c)">
           Dar de baja
         </button>
@@ -62,11 +59,11 @@
     <tr><td colspan="6" class="vacio">No hay clientes para mostrar.</td></tr>
     }
     </tbody>
-  </table>
+  </table></div>
   <footer class="paginador">
     <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas }} · {{ r.totalElementos }} clientes</span>
-    <button type="button" class="btn" [disabled]="r.pagina === 0" (click)="irA(r.pagina - 1)">Anterior</button>
-    <button type="button" class="btn" [disabled]="r.ultima" (click)="irA(r.pagina + 1)">Siguiente</button>
+    <button type="button" class="btn" [disabled]="r.pagina === 0 || cargando()" (click)="irA(r.pagina - 1)">Anterior</button>
+    <button type="button" class="btn" [disabled]="r.ultima || cargando()" (click)="irA(r.pagina + 1)">Siguiente</button>
   </footer>
   }
 </section>

@@ -1,0 +1,68 @@
+:host { display: block; color: #1f2937; }
+.page { max-width: 1440px; margin: 0 auto; padding: 20px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.page-header h2 { margin: 0; color: #0f2e5c; font-size: 24px; }
+.botones { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.filtros {
+	display: grid;
+	grid-template-columns: minmax(180px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+	align-items: end;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 16px;
+	border: 1px solid #dbe3ed;
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: 0 1px 3px rgb(15 46 92 / 8%);
+}
+.filtros label { display: flex; min-width: 0; flex-direction: column; gap: 5px; font-size: 14px; font-weight: 600; }
+.input { box-sizing: border-box; width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #1f2937; font: inherit; }
+.input:focus-visible { outline: 2px solid rgb(15 46 92 / 22%); border-color: #0f2e5c; }
+.btn { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #334155; cursor: pointer; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.btn:hover:not(:disabled) { background: #f1f5f9; }
+.btn:disabled { cursor: not-allowed; opacity: .55; }
+.btn-primary { border-color: #0f2e5c; background: #0f2e5c; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #193d78; }
+.tabla-contenedor { overflow-x: auto; border: 1px solid #dbe3ed; border-radius: 8px; background: #fff; }
+.tabla { width: 100%; min-width: 760px; border-collapse: collapse; }
+.tabla th { padding: 12px 14px; background: #0f2e5c; color: #fff; font-size: 14px; font-weight: 600; text-align: left; white-space: nowrap; }
+.tabla td { padding: 11px 14px; border-bottom: 1px solid #e5e7eb; color: #374151; font-size: 14px; }
+.tabla tbody tr:last-child td { border-bottom: 0; }
+.tabla tbody tr:hover { background: #f8fafc; }
+.monto { text-align: right !important; white-space: nowrap; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge.inactivo { background: #fee2e2; color: #991b1b; }
+.vacio { padding: 24px !important; color: #6b7280 !important; text-align: center; }
+.acciones-fila { display: flex; gap: 6px; }
+.resumen-filtros { margin: 0 0 12px; color: #374151; font-size: 13px; }
+.paginador { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 14px; color: #475569; font-size: 14px; }
+.alerta { margin-bottom: 16px; padding: 12px 16px; border-radius: 6px; background: #fee2e2; color: #991b1b; }
+@media (max-width: 1000px) { .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+	.page { padding: 12px; }
+	.page-header { align-items: flex-start; flex-direction: column; }
+	.filtros { grid-template-columns: 1fr; }
+	.paginador { justify-content: flex-start; }
+}
+@media print {
+	:host, .page { min-width: 0; max-width: none; }
+	.page { margin: 0; padding: 0; }
+	.page-header { display: block; margin-bottom: 12px; }
+	.page-header h2 { font-size: 18pt; }
+	.tabla-contenedor { overflow: visible; border-radius: 0; }
+	.tabla { min-width: 0; width: 100%; table-layout: fixed; }
+	.tabla th, .tabla td { padding: 8px 6px; font-size: 10pt; line-height: 1.35; overflow-wrap: anywhere; }
+	.tabla th { background: #fff; color: #111; white-space: normal; border-bottom: 2px solid #0f2e5c; }
+	.tabla th:nth-child(1) { width: 7%; }
+	.tabla th:nth-child(2) { width: 21%; }
+	.tabla th:nth-child(3) { width: 29%; }
+	.tabla th:nth-child(4) { width: 7%; }
+	.tabla th:nth-child(5) { width: 17%; }
+	.tabla th:nth-child(6) { width: 19%; }
+	.tabla thead { display: table-header-group; }
+	.tabla tr { break-inside: avoid; }
+	.badge { font-size: 9pt; }
+	.resumen-filtros { font-size: 10pt; }
+	.paginador { justify-content: flex-start; gap: 6px; font-size: 10pt; }
+	.paginador .solo-impresion { display: inline; }
+}
