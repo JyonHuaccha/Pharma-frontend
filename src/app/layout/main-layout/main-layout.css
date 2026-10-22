@@ -1,17 +1,20 @@
-:host { display: block; height: 100vh; overflow: hidden; }
+:host { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 100dvh; overflow: hidden; }
 .layout-body {
   display: flex;
-  height: calc(100vh - 64px);
+  min-height: 0;
+  min-width: 0;
 }
 .contenido {
   flex: 1;
+  min-width: 0;
   background: #f1f5f9;
   padding: 24px;
   overflow-y: auto;
 }
+@media (max-width: 700px) { .contenido { padding: 16px; } }
 /* Al imprimir solo queda el contenido de la página: sin cabecera ni menú. */
 @media print {
-  :host { height: auto; overflow: visible; }
+  :host { display: block; height: auto; overflow: visible; }
   .layout-body { display: block; height: auto; }
   .contenido { padding: 0; background: #fff; overflow: visible; }
   app-header, app-sidebar { display: none; }

@@ -8,14 +8,17 @@ import { PaginaResponse } from '../../../../core/models/pagina-response';
 import { mensajeError } from '../../../../core/utils/http-error';
 import { Cliente, Direccion, OrdenCliente } from '../../models/cliente.model';
 import { ClienteService } from '../../services/cliente-service';
+import { AuthService } from '../../../../core/auth/auth-service';
+import { SiPermiso } from '../../../../shared/directives/si-permiso';
 
 @Component({
   selector: 'app-cliente-list',
-  imports: [RouterLink],
+  imports: [RouterLink, SiPermiso],
   templateUrl: './cliente-list.html',
   styleUrl: './cliente-list.css',
 })
 export class ClienteListComponent implements OnInit {
+  protected readonly auth = inject(AuthService);
   private readonly avisos = inject(Avisos);
   private readonly destroyRef = inject(DestroyRef);
   private carga?: Subscription;

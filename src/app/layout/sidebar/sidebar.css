@@ -1,7 +1,7 @@
-:host { display: block; }
+:host { display: block; min-height: 0; }
 .sidebar {
   width: 260px; background: #f8fafc; border-right: 1px solid #e2e8f0;
-  height: calc(100vh - 64px); padding: 16px 0; box-sizing: border-box;
+  height: 100%; overflow-y: auto; padding: 16px 0; box-sizing: border-box;
 }
 .menu-item {
   display: flex; align-items: center; gap: 12px; padding: 12px 20px;
@@ -10,3 +10,7 @@
 .menu-item:hover { background: #f1f5f9; color: #0f2e5c; }
 .menu-item.activo { background: #e0e7ff; color: #1e3a8a; font-weight: 600; border-right: 4px solid #1e3a8a; }
 .icono { font-size: 18px; }
+@media (max-width: 700px) {
+  .sidebar { width: 190px; }
+  .menu-item { padding: 13px; gap: 9px; font-size: 14px; }
+}

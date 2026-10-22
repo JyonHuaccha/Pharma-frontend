@@ -1,0 +1,36 @@
+<main class="fondo">
+  <section class="login" aria-labelledby="titulo-login">
+    <p class="marca">PharmaSoft</p>
+    <h1 id="titulo-login">Iniciar sesión</h1>
+    @if (expirada()) {
+      <div class="aviso" role="status">Su sesión expiró. Inicie sesión nuevamente.</div>
+    }
+    @if (error()) {
+      <div class="alerta" role="alert">{{ error() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="ingresar()" novalidate [attr.aria-busy]="enviando()">
+      <div class="campo">
+        <label for="usuario">Usuario</label>
+        <input id="usuario" formControlName="username" autocomplete="username" maxlength="50"
+               [readOnly]="enviando()"
+               [attr.aria-invalid]="form.controls.username.touched && form.controls.username.invalid"
+               aria-describedby="error-usuario" />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <small id="error-usuario" class="error">Ingrese su usuario, con un máximo de 50 caracteres.</small>
+        }
+      </div>
+      <div class="campo">
+        <label for="password">Contraseña</label>
+        <input id="password" formControlName="password" [type]="verClave() ? 'text' : 'password'"
+               autocomplete="current-password" maxlength="72"
+               [readOnly]="enviando()" aria-describedby="error-password"
+               [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small id="error-password" class="error">Ingrese su contraseña, con un máximo de 72 caracteres.</small>
+        }
+      </div>
+      <label class="ver"><input type="checkbox" [checked]="verClave()" (change)="verClave.set(!verClave())" />Mostrar contraseña</label>
+      <button type="submit" [disabled]="enviando()">{{ enviando() ? 'Ingresando…' : 'Ingresar' }}</button>
+    </form>
+  </section>
+</main>

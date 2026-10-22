@@ -1,7 +1,7 @@
 <section class="page">
   <header class="page-header">
     <h2>Productos</h2>
-    <a routerLink="nuevo" class="btn btn-primary">+ Nuevo producto</a>
+    <a *appSiPermiso="'CATALOGO_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nuevo producto</a>
   </header>
   <div class="filtros">
     <label>
@@ -33,7 +33,7 @@
   @if (cargando()) {
   <p>Cargando productos...</p>
   } @else {
-  <table class="tabla">
+  <div class="tabla-contenedor"><table class="tabla">
     <thead>
     <tr>
       <th><button type="button" class="orden"
@@ -44,7 +44,7 @@
       <th><button type="button" class="orden"
                   (click)="ordenar('stock')">Stock</button></th>
       <th>Estado</th>
-      <th>Acciones</th>
+      <th *appSiPermiso="'CATALOGO_ESCRIBIR'">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -58,7 +58,7 @@
 <span class="badge" [class.inactivo]="!p.estado">{{ p.estado ? 'Activo' :
 'Inactivo' }}</span>
       </td>
-      <td class="acciones">
+      <td *appSiPermiso="'CATALOGO_ESCRIBIR'" class="acciones">
         <a [routerLink]="[p.id, 'editar']" class="btn">Editar</a>
         <button type="button" class="btn btn-peligro" [disabled]="!p.estado"
                 (click)="darDeBaja(p)">
@@ -67,10 +67,10 @@
       </td>
     </tr>
     } @empty {
-    <tr><td colspan="6" class="vacio">No hay productos para mostrar.</td></tr>
+    <tr><td [attr.colspan]="auth.tienePermiso('CATALOGO_ESCRIBIR') ? 6 : 5" class="vacio">No hay productos para mostrar.</td></tr>
     }
     </tbody>
-  </table>
+  </table></div>
   @if (resultado(); as r) {
   <footer class="paginador">
 <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas || 1 }} · {{ r.totalElementos }}
