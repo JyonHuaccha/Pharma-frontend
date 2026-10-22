@@ -8,13 +8,16 @@ import { Categoria } from '../../../categorias/models/categoria.model';
 import { CategoriaService } from '../../../categorias/services/categoria.service';
 import { Direccion, OrdenProducto, Producto } from '../../models/producto.model';
 import { ProductoService } from '../../services/producto-service';
+import { AuthService } from '../../../../core/auth/auth-service';
+import { SiPermiso } from '../../../../shared/directives/si-permiso';
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, CurrencyPipe, SiPermiso],
   templateUrl: './producto-list.html',
   styleUrl: './producto-list.css',
 })
 export class ProductoList implements OnInit {
+  protected readonly auth = inject(AuthService);
   private readonly productoService = inject(ProductoService);
   private readonly categoriaService = inject(CategoriaService);
   readonly categoriaId = input<string>();

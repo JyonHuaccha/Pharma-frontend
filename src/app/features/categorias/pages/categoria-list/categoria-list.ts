@@ -10,14 +10,17 @@ import { Categoria } from '../../models/categoria.model';
 type OrdenCategoria = 'id' | 'nombre' | 'descripcion' | 'estado';
 type Direccion = 'asc' | 'desc';
 import { CategoriaService } from '../../services/categoria.service';
+import { AuthService } from '../../../../core/auth/auth-service';
+import { SiPermiso } from '../../../../shared/directives/si-permiso';
 
 @Component({
   selector: 'app-categoria-list',
-  imports: [RouterLink],
+  imports: [RouterLink, SiPermiso],
   templateUrl: './categoria-list.html',
   styleUrl: './categoria-list.css',
 })
 export class CategoriaList implements OnInit {
+  protected readonly auth = inject(AuthService);
   private readonly avisos = inject(Avisos);
   private readonly destroyRef = inject(DestroyRef);
   private carga?: Subscription;

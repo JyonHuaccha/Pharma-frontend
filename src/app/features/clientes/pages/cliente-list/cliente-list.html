@@ -1,7 +1,7 @@
 <section class="page">
   <header class="page-header">
     <div><h2>Clientes</h2><p class="subtitulo">Administra tus clientes y su estado.</p></div>
-    <a routerLink="nuevo" class="btn btn-primary">+ Nuevo cliente</a>
+    <a *appSiPermiso="'CLIENTES_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nuevo cliente</a>
   </header>
   <div class="filtros">
     <label>
@@ -34,7 +34,7 @@
       <th [attr.aria-sort]="ordenarPor() === 'email' ? (direccion() === 'asc' ? 'ascending' : 'descending') : 'none'"><button type="button" class="orden" (click)="ordenar('email')">Correo <span aria-hidden="true">{{ ordenarPor() === 'email' ? (direccion() === 'asc' ? '↑' : '↓') : '↕' }}</span></button></th>
       <th>Teléfono</th>
       <th>Estado</th>
-      <th>Acciones</th>
+      <th *appSiPermiso="'CLIENTES_ESCRIBIR'">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -47,7 +47,7 @@
       <td>
         <span class="badge" [class.inactivo]="!c.estado">{{ c.estado ? 'Activo' : 'Inactivo' }}</span>
       </td>
-      <td class="acciones">
+      <td *appSiPermiso="'CLIENTES_ESCRIBIR'" class="acciones">
         <a [routerLink]="[c.id, 'editar']" class="btn">Editar</a>
         <button type="button" class="btn btn-peligro" [disabled]="!c.estado || eliminando()"
                 (click)="darDeBaja(c)">
@@ -56,7 +56,7 @@
       </td>
     </tr>
     } @empty {
-    <tr><td colspan="6" class="vacio">No hay clientes para mostrar.</td></tr>
+    <tr><td [attr.colspan]="auth.tienePermiso('CLIENTES_ESCRIBIR') ? 6 : 5" class="vacio">No hay clientes para mostrar.</td></tr>
     }
     </tbody>
   </table></div>

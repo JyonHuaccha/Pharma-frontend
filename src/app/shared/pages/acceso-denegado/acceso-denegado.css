@@ -1,0 +1,5 @@
+.denegado { max-width: 700px; padding: 36px; background: #fff; border: 1px solid #dce5ef; border-radius: 14px; }
+.codigo { margin: 0; color: #906717; font-size: 36px; font-weight: 800; }
+h1 { margin: 12px 0; color: #153e61; font-size: 26px; }
+p { color: #61758a; line-height: 1.7; }
+a { display: inline-block; margin-top: 14px; padding: 11px 16px; border-radius: 8px; background: #153e61; color: white; text-decoration: none; }

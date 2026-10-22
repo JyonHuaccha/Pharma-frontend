@@ -1,6 +1,6 @@
 <aside class="sidebar">
-  <nav>
-    @for (item of menu; track item.ruta) {
+  <nav aria-label="Menú principal">
+    @for (item of menu(); track item.ruta) {
     <a [routerLink]="item.ruta" routerLinkActive="activo" class="menu-item">
       <span class="icono">{{ item.icono }}</span>
       <span class="etiqueta">{{ item.etiqueta }}</span>
