@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.aviso-sesion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1px solid #d4a337;
+  border-radius: 8px;
+  color: #634400;
+  background: #fff5d6;
+  box-shadow: 0 2px 6px #0000000d;
+}
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+button {
+  cursor: pointer;
+  border: 1px solid #967124;
+  border-radius: 5px;
+  padding: 7px 10px;
+  background: #fff;
+  color: #634400;
+  font: inherit;
+}
+.ocultar {
+  border: 0;
+  background: transparent;
+  font-size: 25px;
+  padding: 0 4px;
+}
+button:focus-visible {
+  outline: 3px solid #173c72;
+  outline-offset: 3px;
+}
+@media (max-width: 650px) {
+  .aviso-sesion {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

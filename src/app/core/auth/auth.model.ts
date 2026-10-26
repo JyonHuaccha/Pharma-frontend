@@ -1,9 +1,15 @@
 export const PERMISOS = [
-  'CATALOGO_LEER', 'CATALOGO_ESCRIBIR', 'CLIENTES_LEER', 'CLIENTES_ESCRIBIR',
-  'VENTAS_LEER', 'VENTAS_REGISTRAR', 'REPORTES_VER', 'USUARIOS_ADMINISTRAR',
+  'CATALOGO_LEER',
+  'CATALOGO_ESCRIBIR',
+  'CLIENTES_LEER',
+  'CLIENTES_ESCRIBIR',
+  'VENTAS_LEER',
+  'VENTAS_REGISTRAR',
+  'REPORTES_VER',
+  'USUARIOS_ADMINISTRAR',
 ] as const;
 
-export type Permiso = typeof PERMISOS[number];
+export type Permiso = (typeof PERMISOS)[number];
 
 export interface LoginRequest {
   username: string;
@@ -27,4 +33,18 @@ export interface Sesion {
   nombreCompleto: string;
   roles: string[];
   permisos: Permiso[];
+}
+
+export interface Perfil {
+  username: string;
+  nombreCompleto: string;
+  roles: string[];
+  permisos: string[];
+}
+
+export interface PerfilServidor {
+  username: string;
+  empleadoNombre: string;
+  roles: string[];
+  permisos: string[];
 }
