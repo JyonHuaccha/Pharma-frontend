@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivateChild: [authGuardGuard],
     children: [
       {
+        path: 'mi-cuenta',
+        title: 'Mi cuenta',
+        loadComponent: () => import('./features/auth/pages/mi-cuenta/mi-cuenta').then(m => m.MiCuenta),
+      },
+      {
         path: 'reportes',
         canActivate: [permisoGuardGuard],
         data: { permiso: 'REPORTES_VER' },

@@ -1,0 +1,68 @@
+<section class="cuenta" aria-labelledby="titulo-cuenta" [attr.aria-busy]="cargando()">
+  <header class="titulo">
+    <div>
+      <h1 id="titulo-cuenta">Mi cuenta</h1>
+      <p>Datos y permisos actuales de su cuenta, consultados en el servidor.</p>
+    </div>
+    <button type="button" (click)="cargar()" [disabled]="cargando()">
+      {{ cargando() ? 'Consultando…' : 'Actualizar perfil' }}
+    </button>
+  </header>
+  @if (cargando()) {
+    <p role="status">Cargando los datos de su cuenta…</p>
+  } @else if (error(); as mensaje) {
+    <div class="error" role="alert">
+      <p>{{ mensaje }}</p>
+      <button type="button" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else if (perfil(); as p) {
+    @if (permisosCambiaron()) {
+      <p class="cambio" role="alert">
+        Sus permisos cambiaron. Cierre sesión y vuelva a ingresar para actualizarlos.
+      </p>
+    }
+    <div class="identidad">
+      <dl>
+        <div>
+          <dt>Nombre completo</dt>
+          <dd>{{ p.nombreCompleto }}</dd>
+        </div>
+        <div>
+          <dt>Usuario</dt>
+          <dd>{{ p.username }}</dd>
+        </div>
+      </dl>
+      <div class="roles">
+        <span class="etiqueta-roles">Roles</span>
+        @for (rol of p.roles; track rol) {
+          <span class="rol">{{ rol }}</span>
+        }
+      </div>
+    </div>
+    <h2>Permisos por módulo</h2>
+    <div class="modulos">
+      @for (modulo of modulos; track modulo.nombre) {
+        <section class="modulo">
+          <h3>{{ modulo.nombre }}</h3>
+          <ul>
+            @for (permiso of modulo.permisos; track permiso.codigo) {
+              <li>
+                <span
+                  [class.concedido]="p.permisos.includes(permiso.codigo)"
+                  [class.denegado]="!p.permisos.includes(permiso.codigo)"
+                  [attr.aria-label]="
+                    p.permisos.includes(permiso.codigo) ? 'Permitido' : 'No permitido'
+                  "
+                  >{{ p.permisos.includes(permiso.codigo) ? '✔' : '✘' }}</span
+                >
+                <div>
+                  {{ permiso.nombre }}<small>{{ permiso.codigo }}</small>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  }
+</section>
