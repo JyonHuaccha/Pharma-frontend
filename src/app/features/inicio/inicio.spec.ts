@@ -25,10 +25,12 @@ describe('Reporte diferido del inicio', () => {
       if (permitido) {
         await bloques[0].render(DeferBlockState.Complete);
         http.expectOne(environment.apiUrl + '/reportes/productos-mas-vendidos').flush([
-          { productoId: 1, productoNombre: 'Paracetamol', categoriaNombre: 'Analgésicos', cantidadVendida: 2, montoTotal: 10 },
+          { id: 1, name: 'Paracetamol', categoria: 'Analgésicos', cantidad: 2, total: 10 },
         ]);
         fixture.detectChanges();
         expect(fixture.nativeElement.textContent).toContain('Paracetamol');
+        expect(fixture.nativeElement.textContent).toContain('Analgésicos');
+        expect(fixture.nativeElement.textContent).toContain('10.00');
       }
       http.verify();
     });

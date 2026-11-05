@@ -12,3 +12,12 @@ export interface ProductoMasVendido {
   cantidadVendida: number;
   montoTotal: number;
 }
+
+/** Contrato del reporte existente de PharmaBackend. */
+export interface ProductoMasVendidoServidor {
+  id: number;
+  name: string;
+  categoria: string;
+  cantidad: number;
+  total: number;
+}

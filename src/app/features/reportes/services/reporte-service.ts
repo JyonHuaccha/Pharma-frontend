@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ProductoMasVendido, VentaPorCategoria } from '../models/reporte.model';
+import { ProductoMasVendido, ProductoMasVendidoServidor, VentaPorCategoria } from '../models/reporte.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReporteService {
@@ -10,7 +10,15 @@ export class ReporteService {
   private readonly url = `${environment.apiUrl}/reportes`;
 
   productosMasVendidos(): Observable<ProductoMasVendido[]> {
-    return this.http.get<ProductoMasVendido[]>(`${this.url}/productos-mas-vendidos`);
+    return this.http.get<ProductoMasVendidoServidor[]>(`${this.url}/productos-mas-vendidos`).pipe(
+      map(filas => filas.map(fila => ({
+        productoId: fila.id,
+        productoNombre: fila.name,
+        categoriaNombre: fila.categoria,
+        cantidadVendida: fila.cantidad,
+        montoTotal: fila.total,
+      }))),
+    );
   }
 
   ventasPorCategoria(desde: string | null, hasta: string | null): Observable<VentaPorCategoria[]> {
