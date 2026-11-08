@@ -47,3 +47,8 @@ Thumbs.db
 /docs/autonoma-s9/
 /docs/evidencias/
 /docs/*_materiales.zip
+
+# Secretos de ejecución locales
+.env
+.env.*
+!.env.example
