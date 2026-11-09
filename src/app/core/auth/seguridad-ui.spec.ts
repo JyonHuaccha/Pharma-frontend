@@ -25,8 +25,13 @@ describe('Seguridad de rutas y acciones con los componentes reales', () => {
   }
   function responderConsultas() {
     for (const req of http.match(() => true)) {
-      if (!req.cancelled) req.flush(req.request.url.endsWith('/productos') ? [{ id: 1, nombre: 'Producto de prueba',
-        precio: 4, stock: 10, estado: true, categoriaId: 1, categoriaNombre: 'Categoria de prueba' }] : []);
+      if (!req.cancelled) {
+        const productos = [{ id: 1, nombre: 'Producto de prueba', precio: 4, stock: 10,
+          estado: true, categoriaId: 1, categoriaNombre: 'Categoria de prueba' }];
+        req.flush(req.request.url.endsWith('/productos')
+          ? { contenido: productos, pagina: 0, tamanio: 10, totalElementos: 1, totalPaginas: 1, ultima: true }
+          : []);
+      }
     }
   }
   it('sin sesion la URL de ventas muestra el login fuera del layout y recuerda la ruta', async () => {

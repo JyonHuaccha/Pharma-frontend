@@ -33,7 +33,7 @@
   @if (cargando()) {
   <p>Cargando productos...</p>
   } @else {
-  <div class="tabla-contenedor"><table class="tabla">
+  <table class="tabla">
     <thead>
     <tr>
       <th><button type="button" class="orden"
@@ -67,10 +67,10 @@
       </td>
     </tr>
     } @empty {
-    <tr><td [attr.colspan]="auth.tienePermiso('CATALOGO_ESCRIBIR') ? 6 : 5" class="vacio">No hay productos para mostrar.</td></tr>
+    <tr><td colspan="6" class="vacio">No hay productos para mostrar.</td></tr>
     }
     </tbody>
-  </table></div>
+  </table>
   @if (resultado(); as r) {
   <footer class="paginador">
 <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas || 1 }} · {{ r.totalElementos }}

@@ -23,3 +23,5 @@
   .usuario { grid-column: 2 / 4; grid-row: 2; align-items: flex-start; }
   .btn-salir { grid-column: 3; grid-row: 1; }
 }
+
+.mi-cuenta{color:#ffe09b;margin-left:14px;font-size:13px;white-space:nowrap}.mi-cuenta:focus-visible{outline:3px solid #ffe09b;outline-offset:3px}

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, PERMISOS, Permiso, Sesion } from './auth.model';
+import { LoginRequest, LoginResponse, Perfil, PerfilServidor, PERMISOS, Permiso, Sesion } from './auth.model';
 import { rutaInterna } from './ruta-interna';
 
 const CLAVE_SESION = 'pharmasoft.sesion';
@@ -14,14 +14,18 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly sesionActual = signal<Sesion | null>(this.leerSesionGuardada());
   private temporizador?: ReturnType<typeof setTimeout>;
+  private intervalo?: ReturnType<typeof setInterval>;
 
   readonly sesion = this.sesionActual.asReadonly();
   readonly autenticado = computed(() => this.sesionActual() !== null);
+  readonly segundosRestantes = signal(0);
+  readonly avisoOculto = signal(false);
+  readonly porVencer = computed(() => this.autenticado() && this.segundosRestantes() > 0 && this.segundosRestantes() <= 120);
 
   constructor() {
     const sesion = this.sesionActual();
-    if (sesion) this.programarExpiracion(sesion);
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.temporizador));
+    if (sesion) this.iniciarTemporizadores(sesion);
+    inject(DestroyRef).onDestroy(() => this.limpiarTemporizadores());
   }
 
   login(credenciales: LoginRequest): Observable<Sesion> {
@@ -43,15 +47,26 @@ export class AuthService {
       tap(sesion => {
         try { sessionStorage.setItem(CLAVE_SESION, JSON.stringify(sesion)); } catch { /* Sesión en memoria. */ }
         this.sesionActual.set(sesion);
-        this.programarExpiracion(sesion);
+        this.avisoOculto.set(false);
+        this.iniciarTemporizadores(sesion);
       }),
     );
   }
 
+  obtenerPerfil(): Observable<Perfil> {
+    return this.http.get<PerfilServidor>(`${environment.apiUrl}/auth/me`).pipe(map(p => ({
+      username: p.username, nombreCompleto: p.empleadoNombre, roles: p.roles, permisos: p.permisos,
+    })));
+  }
+
+  ocultarAviso(): void { this.avisoOculto.set(true); }
+
   cerrarSesion(motivo?: 'expirada', volverA?: string): void {
-    clearTimeout(this.temporizador);
+    this.limpiarTemporizadores();
     this.borrarSesionGuardada();
     this.sesionActual.set(null);
+    this.segundosRestantes.set(0);
+    this.avisoOculto.set(false);
     const queryParams: Record<string, string> = {};
     if (motivo) queryParams['expirada'] = '1';
     const destino = rutaInterna(volverA);
@@ -66,6 +81,29 @@ export class AuthService {
 
   tienePermiso(permiso: Permiso): boolean {
     return this.token() !== null && (this.sesionActual()?.permisos.includes(permiso) ?? false);
+  }
+
+  private iniciarTemporizadores(sesion: Sesion): void {
+    this.limpiarTemporizadores();
+    this.actualizarRestante(sesion);
+    this.intervalo = setInterval(() => {
+      this.actualizarRestante(sesion);
+      if (this.sesionActual() === sesion && Date.now() >= sesion.expiraEn) {
+        this.cerrarSesion('expirada', this.router.url);
+      }
+    }, 1000);
+    this.programarExpiracion(sesion);
+  }
+
+  private actualizarRestante(sesion: Sesion): void {
+    this.segundosRestantes.set(Math.max(0, Math.floor((sesion.expiraEn - Date.now()) / 1000)));
+  }
+
+  private limpiarTemporizadores(): void {
+    clearTimeout(this.temporizador);
+    clearInterval(this.intervalo);
+    this.temporizador = undefined;
+    this.intervalo = undefined;
   }
 
   private programarExpiracion(sesion: Sesion): void {
