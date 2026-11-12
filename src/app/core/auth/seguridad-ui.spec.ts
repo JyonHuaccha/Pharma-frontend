@@ -42,7 +42,7 @@ describe('Seguridad de rutas y acciones con los componentes reales', () => {
   });
   it('vendedor consulta productos sin boton nuevo, edicion ni columna acciones', async () => {
     guardar(['CATALOGO_LEER', 'CLIENTES_LEER', 'VENTAS_LEER', 'VENTAS_REGISTRAR']);
-    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); h.detectChanges();
+    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); await h.fixture.whenStable(); h.detectChanges();
     const html = h.routeNativeElement!;
     expect(html.textContent).toContain('Producto de prueba');
     expect(html.querySelector('a[routerLink="nuevo"]')).toBeNull();
@@ -62,7 +62,7 @@ describe('Seguridad de rutas y acciones con los componentes reales', () => {
   }
   it('almacenero ve edicion del catalogo pero no ventas ni clientes', async () => {
     guardar(['CATALOGO_LEER', 'CATALOGO_ESCRIBIR'], ['ALMACENERO']);
-    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); h.detectChanges();
+    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); await h.fixture.whenStable(); h.detectChanges();
     expect(h.routeNativeElement!.textContent).toContain('Nuevo producto');
     expect(h.routeNativeElement!.textContent).toContain('Dar de baja');
     expect(h.routeNativeElement!.querySelector('a[href="/ventas"]')).toBeNull();
@@ -72,7 +72,7 @@ describe('Seguridad de rutas y acciones con los componentes reales', () => {
   });
   it('supervisor tiene ventas y edicion del catalogo por la union de permisos', async () => {
     guardar(['CATALOGO_LEER', 'CATALOGO_ESCRIBIR', 'VENTAS_LEER', 'VENTAS_REGISTRAR'], ['VENDEDOR', 'ALMACENERO']);
-    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); h.detectChanges();
+    const h = await RouterTestingHarness.create('/productos'); responderConsultas(); await h.fixture.whenStable(); h.detectChanges();
     expect(h.routeNativeElement!.querySelector('a[href="/ventas"]')).not.toBeNull();
     expect(h.routeNativeElement!.textContent).toContain('Nuevo producto');
     expect(h.routeNativeElement!.textContent).toContain('ALMACENERO');
