@@ -1,0 +1,4 @@
+.paginador { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.resumen { margin-right: auto; color: #526279; }
+label { display: flex; gap: 8px; align-items: center; }
+select { padding: 8px; border: 1px solid #ced8e8; border-radius: 6px; background: white; }
