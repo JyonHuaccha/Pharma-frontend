@@ -71,6 +71,7 @@ describe('Flujos integrados S11', () => {
       if (r.request.url.includes('/productos')) r.error(new ProgressEvent('error'));
       else r.flush([]);
     }
+    await h.fixture.whenStable();
     h.detectChanges();
     expect(h.routeNativeElement!.textContent).toContain('No se pudo conectar con el servidor');
     expect(TestBed.inject(AuthService).token()).toBe('jwt-firmado');

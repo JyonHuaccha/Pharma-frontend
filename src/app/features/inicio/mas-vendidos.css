@@ -1,0 +1,8 @@
+:host { display: block; margin-top: 24px; }
+.card { background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 2px 4px #0000000d; }
+h2 { margin: 0 0 20px; color: #0f2e5c; font-size: 1.25rem; }
+.tabla-contenedor { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { background: #f1f5f9; }
+@media print { .card { padding: 0; box-shadow: none; } .tabla-contenedor { overflow: visible; } }
