@@ -3,6 +3,8 @@ export interface Categoria {
   nombre: string;
   descripcion: string | null;
   estado: boolean;
+  creadoPor?: string | null;
+  modificadoPor?: string | null;
   fechaCreacion: string;
   fechaModificacion: string | null;
 }

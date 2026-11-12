@@ -1,128 +1,117 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  numberAttribute,
+  signal,
+} from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PaginaResponse } from '../../../../core/models/pagina-response';
 import { mensajeError } from '../../../../core/utils/http-error';
-import { Categoria } from '../../../categorias/models/categoria.model';
 import { CategoriaService } from '../../../categorias/services/categoria.service';
 import { Direccion, OrdenProducto, Producto } from '../../models/producto.model';
 import { ProductoService } from '../../services/producto-service';
-import { AuthService } from '../../../../core/auth/auth-service';
 import { SiPermiso } from '../../../../shared/directives/si-permiso';
+import { Paginador } from '../../../../shared/components/paginador/paginador';
+
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, CurrencyPipe, SiPermiso],
+  imports: [RouterLink, CurrencyPipe, SiPermiso, Paginador],
   templateUrl: './producto-list.html',
   styleUrl: './producto-list.css',
 })
-export class ProductoList implements OnInit {
-  protected readonly auth = inject(AuthService);
-  private readonly productoService = inject(ProductoService);
-  private readonly categoriaService = inject(CategoriaService);
+export class ProductoList {
+  private readonly servicio = inject(ProductoService);
+  private readonly categoriasServicio = inject(CategoriaService);
+  private readonly router = inject(Router);
+  readonly pagina = input(0, { transform: (v: unknown) => numberAttribute(v, 0) });
+  readonly tamanio = input(20, { transform: (v: unknown) => numberAttribute(v, 20) });
+  readonly orden = input<OrdenProducto>('nombre');
+  readonly dir = input<Direccion>('asc');
   readonly categoriaId = input<string>();
-
-  protected readonly pagina = signal(0);
-  protected readonly tamanio = signal(10);
-  protected readonly ordenarPor = signal<OrdenProducto>('nombre');
-  protected readonly direccion = signal<Direccion>('asc');
-  protected readonly resultado = signal<PaginaResponse<Producto> | null>(null);
-  protected readonly categorias = signal<Categoria[]>([]);
-  protected readonly categoriaFiltro = signal<number | null>(null);
-  protected readonly desdeCategoria = signal(false);
-  protected readonly cargando = signal(false);
-  protected readonly error = signal<string | null>(null);
-  protected readonly opcionesFiltro = computed(() => {
-    const filtro = this.categoriaFiltro();
-    return this.categorias().filter((c) => c.estado || c.id === filtro);
-  });
-  protected readonly nombreCategoriaFiltro = computed(
-    () => this.categorias().find((c) => c.id === this.categoriaFiltro())?.nombre ?? null,
+  protected readonly errorOperacion = signal<string | null>(null);
+  protected readonly categoriaFiltro = computed(() =>
+    this.categoriaId() ? Number(this.categoriaId()) : null,
   );
+  private readonly catalogoCategorias = rxResource({
+    stream: () => this.categoriasServicio.listar(),
+  });
+  protected readonly categorias = computed(() =>
+    this.catalogoCategorias.hasValue() ? this.catalogoCategorias.value() : [],
+  );
+  protected readonly opcionesFiltro = computed(() =>
+    this.categorias().filter((c) => c.estado || c.id === this.categoriaFiltro()),
+  );
+  protected readonly nombreCategoriaFiltro = computed(
+    () => this.categorias().find((c) => c.id === this.categoriaFiltro())?.nombre,
+  );
+  protected readonly recurso = rxResource({
+    params: () => ({
+      pagina: this.pagina(),
+      tamanio: this.tamanio(),
+      orden: this.orden() ?? 'nombre',
+      dir: this.dir() ?? 'asc',
+      categoria: this.categoriaFiltro(),
+    }),
+    stream: ({ params: c }) =>
+      this.servicio.listar(c.pagina, c.tamanio, c.orden, c.dir, c.categoria),
+  });
+  protected readonly resultado = linkedSignal<
+    PaginaResponse<Producto> | undefined,
+    PaginaResponse<Producto> | undefined
+  >({
+    source: () => (this.recurso.hasValue() ? this.recurso.value() : undefined),
+    computation: (nueva, anterior) => nueva ?? anterior?.value,
+  });
   protected readonly productos = computed(() => this.resultado()?.contenido ?? []);
+  protected readonly cargando = this.recurso.isLoading;
+  protected readonly error = computed(() => {
+    const err = this.recurso.error() ?? this.catalogoCategorias.error();
+    return this.errorOperacion() ?? (err instanceof HttpErrorResponse ? mensajeError(err) : null);
+  });
 
-  ngOnInit(): void {
-        const id = Number(this.categoriaId());
-    if (this.categoriaId() && Number.isInteger(id) && id > 0) {
-      this.categoriaFiltro.set(id);
-      this.tamanio.set(100);
-      this.desdeCategoria.set(true);
-    }
-    this.categoriaService.listar().subscribe({
-      next: (datos) => this.categorias.set(datos),
-      error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
+  constructor() {
+    effect(() => {
+      const r = this.recurso.hasValue() ? this.recurso.value() : undefined;
+      if (r && r.pagina > 0 && r.contenido.length === 0) this.irA(Math.max(0, r.totalPaginas - 1));
     });
-    this.cargar();
-  }
-
-  cargar(): void {
-    this.cargando.set(true);
-    this.error.set(null);
-    this.productoService
-      .listar(
-        this.pagina(),
-        this.tamanio(),
-        this.ordenarPor(),
-        this.direccion(),
-        this.categoriaFiltro(),
-      )
-      .subscribe({
-        next: (pagina) => {
-          if (pagina.contenido.length === 0 && this.pagina() > 0) {
-            this.pagina.set(Math.max(0, this.pagina() - 1));
-            this.cargar();
-            return;
-          }
-          this.resultado.set(pagina);
-          this.cargando.set(false);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.error.set(mensajeError(err));
-          this.cargando.set(false);
-        },
-      });
   }
 
   irA(pagina: number): void {
-    this.pagina.set(pagina);
-    this.cargar();
+    this.navegar({ pagina });
   }
-
-  cambiarTamanio(valor: string): void {
-    this.tamanio.set(Number(valor));
-    this.irA(0);
+  cambiarTamanio(tamanio: number): void {
+    this.navegar({ tamanio, pagina: 0 });
   }
-
   ordenar(campo: OrdenProducto): void {
-    if (this.ordenarPor() === campo) {
-      this.direccion.update((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.ordenarPor.set(campo);
-      this.direccion.set('asc');
-    }
-    this.irA(0);
+    this.navegar({
+      orden: campo,
+      dir: this.orden() === campo && this.dir() === 'asc' ? 'desc' : 'asc',
+      pagina: 0,
+    });
   }
-
   filtrarPorCategoria(valor: string): void {
-    this.categoriaFiltro.set(valor ? Number(valor) : null);
-    this.irA(0);
+    this.navegar({ categoriaId: valor || null, pagina: 0 });
   }
 
   darDeBaja(producto: Producto): void {
-    if (!confirm(`¿Dar de baja el producto "${producto.nombre}"?`)) {
-      return;
-    }
-    const paginaAntes = this.pagina();
-    const quedariaVaciaLaPagina = (this.resultado()?.contenido.length ?? 0) <= 1 && paginaAntes > 0;
-
-    this.productoService.darDeBaja(producto.id).subscribe({
+    if (!confirm(`¿Dar de baja el producto "${producto.nombre}"?`)) return;
+    this.servicio.darDeBaja(producto.id).subscribe({
       next: () => {
-        if (quedariaVaciaLaPagina) {
-          this.pagina.set(Math.max(0, paginaAntes - 1));
-        }
-        this.cargar();
+        this.errorOperacion.set(null);
+        this.recurso.reload();
       },
-      error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
+      error: (err: HttpErrorResponse) => this.errorOperacion.set(mensajeError(err)),
     });
+  }
+
+  private navegar(cambios: Record<string, string | number | null>): void {
+    void this.router.navigate([], { queryParams: cambios, queryParamsHandling: 'merge' });
   }
 }
