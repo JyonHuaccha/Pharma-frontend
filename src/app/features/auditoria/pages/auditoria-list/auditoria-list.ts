@@ -27,14 +27,22 @@ export class AuditoriaList {
   readonly hasta = input<string>();
   protected readonly acciones = ACCIONES_AUDITORIA;
   protected readonly errorFiltro = signal<string | null>(null);
-  protected readonly filtros = this.fb.group({ usuario: [''], accion: [''], desde: [''], hasta: [''] });
+  protected readonly filtros = this.fb.group({
+    usuario: [''],
+    accion: [''],
+    desde: [''],
+    hasta: [''],
+  });
   protected readonly recurso = rxResource({
     params: () => ({
       filtros: {
-        usuario: this.usuario() || null, accion: this.accion() || null,
-        desde: this.desde() || null, hasta: this.hasta() || null,
+        usuario: this.usuario() || null,
+        accion: this.accion() || null,
+        desde: this.desde() || null,
+        hasta: this.hasta() || null,
       },
-      pagina: this.pagina(), tamanio: this.tamanio(),
+      pagina: this.pagina(),
+      tamanio: this.tamanio(),
     }),
     stream: ({ params: p }) => this.servicio.buscar(p.filtros, p.pagina, p.tamanio),
   });
@@ -44,10 +52,17 @@ export class AuditoriaList {
   });
 
   constructor() {
-    effect(() => this.filtros.patchValue({
-      usuario: this.usuario() ?? '', accion: this.accion() ?? '',
-      desde: this.desde() ?? '', hasta: this.hasta() ?? '',
-    }, { emitEvent: false }));
+    effect(() =>
+      this.filtros.patchValue(
+        {
+          usuario: this.usuario() ?? '',
+          accion: this.accion() ?? '',
+          desde: this.desde() ?? '',
+          hasta: this.hasta() ?? '',
+        },
+        { emitEvent: false },
+      ),
+    );
     effect(() => {
       const r = this.recurso.hasValue() ? this.recurso.value() : undefined;
       if (r && r.pagina > 0 && !r.contenido.length) this.irA(Math.max(0, r.totalPaginas - 1));
@@ -61,8 +76,13 @@ export class AuditoriaList {
       return;
     }
     this.errorFiltro.set(null);
-    this.navegar({ usuario: f.usuario?.trim() || null, accion: f.accion || null,
-      desde: f.desde || null, hasta: f.hasta || null, pagina: 0 });
+    this.navegar({
+      usuario: f.usuario?.trim() || null,
+      accion: f.accion || null,
+      desde: f.desde || null,
+      hasta: f.hasta || null,
+      pagina: 0,
+    });
   }
 
   limpiar(): void {
@@ -70,8 +90,12 @@ export class AuditoriaList {
     this.buscar();
   }
 
-  irA(pagina: number): void { this.navegar({ pagina }); }
-  cambiarTamanio(tamanio: number): void { this.navegar({ tamanio, pagina: 0 }); }
+  irA(pagina: number): void {
+    this.navegar({ pagina });
+  }
+  cambiarTamanio(tamanio: number): void {
+    this.navegar({ tamanio, pagina: 0 });
+  }
 
   private navegar(queryParams: Record<string, string | number | null>): void {
     void this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });

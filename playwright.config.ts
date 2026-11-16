@@ -34,9 +34,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env['E2E_PRODUCCION'] === '1'
-      ? 'node scripts/servidor-e2e.mjs'
-      : 'npm start -- --host 127.0.0.1',
+    command:
+      process.env['E2E_PRODUCCION'] === '1'
+        ? 'node scripts/servidor-e2e.mjs'
+        : 'npm start -- --host 127.0.0.1',
     url: process.env['E2E_BASE_URL'] ?? 'http://localhost:4200',
     reuseExistingServer: true,
     timeout: 120_000,

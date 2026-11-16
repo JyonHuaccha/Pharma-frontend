@@ -9,11 +9,17 @@ import { AuditoriaEvento, FiltroAuditoria } from '../models/auditoria.model';
 export class AuditoriaService {
   private readonly http = inject(HttpClient);
 
-  buscar(filtros: FiltroAuditoria, pagina: number, tamanio: number): Observable<PaginaResponse<AuditoriaEvento>> {
+  buscar(
+    filtros: FiltroAuditoria,
+    pagina: number,
+    tamanio: number,
+  ): Observable<PaginaResponse<AuditoriaEvento>> {
     let params = new HttpParams().set('pagina', pagina).set('tamanio', tamanio);
     for (const [nombre, valor] of Object.entries(filtros)) {
       if (valor) params = params.set(nombre, valor.trim());
     }
-    return this.http.get<PaginaResponse<AuditoriaEvento>>(`${environment.apiUrl}/auditoria`, { params });
+    return this.http.get<PaginaResponse<AuditoriaEvento>>(`${environment.apiUrl}/auditoria`, {
+      params,
+    });
   }
 }

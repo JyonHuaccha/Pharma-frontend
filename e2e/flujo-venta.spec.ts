@@ -21,9 +21,11 @@ test('el vendedor registra una venta y Productos refleja el stock', async ({ pag
   expect(stockAntes).toBeGreaterThanOrEqual(2);
   await opcion.click();
   await page.getByTestId('cantidad').fill('2');
-  await expect.poll(async () => Number(
-    (await page.getByTestId('total-venta').innerText()).replace(/[^\d.-]/g, ''),
-  )).toBeGreaterThan(0);
+  await expect
+    .poll(async () =>
+      Number((await page.getByTestId('total-venta').innerText()).replace(/[^\d.-]/g, '')),
+    )
+    .toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Revisar venta', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Confirmar venta' });
   await dialog.getByRole('checkbox').uncheck();

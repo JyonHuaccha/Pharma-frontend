@@ -15,10 +15,17 @@ async function elegirClienteProducto(page: Page) {
   await page.getByTestId('buscar-cliente').fill(process.env['E2E_CLIENTE']!);
   await page.getByTestId('opcion-cliente').first().click();
   await page.getByTestId('buscar-producto').fill(process.env['E2E_PRODUCTO']!);
-  await page.getByTestId('opcion-producto').filter({ hasText: process.env['E2E_PRODUCTO']! }).first().click();
+  await page
+    .getByTestId('opcion-producto')
+    .filter({ hasText: process.env['E2E_PRODUCTO']! })
+    .first()
+    .click();
 }
 
-test('E2E-08 stock cambia tras la consulta: 409 visible y ninguna venta parcial', async ({ page, request }, info) => {
+test('E2E-08 stock cambia tras la consulta: 409 visible y ninguna venta parcial', async ({
+  page,
+  request,
+}, info) => {
   const headers = await cabeceras(request);
   const url = `${apiUrl}/api/v1/productos/${process.env['E2E_PRODUCTO_ID']}`;
   const original = await (await request.get(url, { headers })).json();
@@ -33,7 +40,9 @@ test('E2E-08 stock cambia tras la consulta: 409 visible y ninguna venta parcial'
     await page.getByRole('button', { name: 'Revisar venta', exact: true }).click();
     const dialogo = page.getByRole('dialog', { name: 'Confirmar venta' });
     await dialogo.getByRole('checkbox').uncheck();
-    const respuesta = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith('/api/v1/ventas'));
+    const respuesta = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && r.url().endsWith('/api/v1/ventas'),
+    );
     await dialogo.getByRole('button', { name: 'Confirmar venta', exact: true }).click();
     expect((await respuesta).status()).toBe(409);
     await expect(page.locator('.alerta')).toContainText('Stock insuficiente');
@@ -46,16 +55,24 @@ test('E2E-08 stock cambia tras la consulta: 409 visible y ninguna venta parcial'
   }
 });
 
-test('E2E-09 una venta sin productos no permite continuar y la API devuelve 400', async ({ page, request }, info) => {
+test('E2E-09 una venta sin productos no permite continuar y la API devuelve 400', async ({
+  page,
+  request,
+}, info) => {
   await iniciarSesion(page, 'vendedor', '/ventas/nueva');
   await expect(page.getByRole('button', { name: 'Revisar venta', exact: true })).toBeDisabled();
   const headers = await cabeceras(request, 'vendedor');
-  const r = await request.post(`${apiUrl}/api/v1/ventas`, { headers, data: { clienteId: Number(process.env['E2E_CLIENTE_ID']), detalles: [] } });
+  const r = await request.post(`${apiUrl}/api/v1/ventas`, {
+    headers,
+    data: { clienteId: Number(process.env['E2E_CLIENTE_ID']), detalles: [] },
+  });
   expect(r.status()).toBe(400);
   await capturar(page, info, '09-venta-sin-productos');
 });
 
-test('E2E-10 cliente creado en la SPA queda disponible para vender inmediatamente', async ({ page }, info) => {
+test('E2E-10 cliente creado en la SPA queda disponible para vender inmediatamente', async ({
+  page,
+}, info) => {
   await iniciarSesion(page, 'vendedor', '/clientes/nuevo');
   const dni = String(randomInt(10000000, 99999999));
   await page.locator('[formControlName="dni"]').fill(dni);
@@ -63,7 +80,10 @@ test('E2E-10 cliente creado en la SPA queda disponible para vender inmediatament
   await page.locator('[formControlName="apellidos"]').fill('Huaccha');
   await page.locator('[formControlName="email"]').fill(`nuevo-${Date.now()}-${dni}@example.test`);
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Guardar cliente' }).getByRole('button', { name: 'Guardar', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Guardar cliente' })
+    .getByRole('button', { name: 'Guardar', exact: true })
+    .click();
   await expect(page).toHaveURL(/\/clientes$/);
   await page.locator('a[href="/ventas"]').first().click();
   await page.getByRole('link', { name: /Nueva venta/ }).click();
@@ -81,7 +101,9 @@ test('E2E-10 cliente creado en la SPA queda disponible para vender inmediatament
   await capturar(page, info, '10-cliente-nuevo-venta');
 });
 
-test('E2E-11 filtrar fechas desde la tercera página vuelve a la primera', async ({ page }, info) => {
+test('E2E-11 filtrar fechas desde la tercera página vuelve a la primera', async ({
+  page,
+}, info) => {
   await iniciarSesion(page, 'vendedor', '/ventas?pagina=2&tamanio=20');
   await expect(page.getByTestId('pagina-actual')).toContainText('Página 3 de');
   const hoy = new Date().toISOString().slice(0, 10);
@@ -94,9 +116,18 @@ test('E2E-11 filtrar fechas desde la tercera página vuelve a la primera', async
   await capturar(page, info, '11-filtros-reinician-pagina');
 });
 
-test('E2E-12 admin encuentra la venta recién creada y su requestId en auditoría', async ({ page, request }, info) => {
+test('E2E-12 admin encuentra la venta recién creada y su requestId en auditoría', async ({
+  page,
+  request,
+}, info) => {
   const headers = await cabeceras(request, 'vendedor');
-  const r = await request.post(`${apiUrl}/api/v1/ventas`, { headers, data: { clienteId: Number(process.env['E2E_CLIENTE_ID']), detalles: [{ productoId: Number(process.env['E2E_PRODUCTO_ID']), cantidad: 1 }] } });
+  const r = await request.post(`${apiUrl}/api/v1/ventas`, {
+    headers,
+    data: {
+      clienteId: Number(process.env['E2E_CLIENTE_ID']),
+      detalles: [{ productoId: Number(process.env['E2E_PRODUCTO_ID']), cantidad: 1 }],
+    },
+  });
   expect(r.status()).toBe(201);
   const venta = await r.json();
   const idPeticion = r.headers()['x-request-id'];
@@ -106,7 +137,10 @@ test('E2E-12 admin encuentra la venta recién creada y su requestId en auditorí
   await page.getByLabel('Acción', { exact: true }).selectOption('VENTA_REGISTRADA');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await expect(page).toHaveURL(/accion=VENTA_REGISTRADA/);
-  const fila = page.getByTestId('tabla-auditoria').locator('tbody tr').filter({ hasText: idPeticion });
+  const fila = page
+    .getByTestId('tabla-auditoria')
+    .locator('tbody tr')
+    .filter({ hasText: idPeticion });
   await expect(fila.locator('td').nth(4)).toHaveText(String(venta.id));
   await page.reload();
   await expect(fila).toBeVisible();
@@ -131,11 +165,15 @@ test('E2E-14 token alterado en sessionStorage fuerza login con aviso', async ({ 
     sesion.token = partes.join('.');
     sessionStorage.setItem('pharmasoft.sesion', JSON.stringify(sesion));
   });
-  const rechazo = page.waitForResponse(r => r.url().includes('/api/v1/productos') && r.status() === 401);
+  const rechazo = page.waitForResponse(
+    (r) => r.url().includes('/api/v1/productos') && r.status() === 401,
+  );
   await page.reload();
   await rechazo;
   await expect(page).toHaveURL(/\/login\?.*expirada=1/);
   await expect(page.getByText(/Su sesión expiró/)).toBeVisible();
-  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('pharmasoft.sesion'))).toBeNull();
+  await expect
+    .poll(() => page.evaluate(() => sessionStorage.getItem('pharmasoft.sesion')))
+    .toBeNull();
   await capturar(page, info, '14-token-alterado');
 });
