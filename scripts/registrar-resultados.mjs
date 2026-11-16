@@ -1,13 +1,18 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 const r = JSON.parse(await readFile('test-results/resultados.json', 'utf8'));
-const version = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const version = process.env.E2E_COMMIT ?? execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const filas = [];
 function recorrer(suites) {
   for (const s of suites) {
     for (const spec of s.specs ?? []) {
-      for (const t of spec.tests)
-        filas.push([spec.title, t.repeatEachIndex + 1, t.status, t.results[0]?.duration ?? 0]);
+      const repeticiones = new Map();
+      for (const t of spec.tests) {
+        const proyecto = t.projectId ?? t.projectName ?? 'default';
+        const indice = repeticiones.get(proyecto) ?? 0;
+        repeticiones.set(proyecto, indice + 1);
+        filas.push([spec.title, (t.repeatEachIndex ?? indice) + 1, t.results[0]?.status ?? t.status, t.results[0]?.duration ?? 0]);
+      }
     }
     recorrer(s.suites ?? []);
   }
