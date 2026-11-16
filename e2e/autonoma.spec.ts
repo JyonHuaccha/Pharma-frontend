@@ -49,6 +49,9 @@ test('E2E-08 stock cambia tras la consulta: 409 visible y ninguna venta parcial'
     const despues = await (await request.get(buscar, { headers })).json();
     expect(despues.totalElementos).toBe(antes.totalElementos);
     expect((await (await request.get(url, { headers })).json()).stock).toBe(0);
+    // Esperar la recarga real que dispara el 409 antes de restaurar el stock.
+    // Con miles de filas, restaurarlo antes puede dejar una lectura anterior en caché.
+    await expect(page.getByRole('status')).toContainText('Stock y precios actualizados');
     await capturar(page, info, '08-stock-insuficiente');
   } finally {
     expect((await request.put(url, { headers, data: original })).status()).toBe(200);
