@@ -16,6 +16,14 @@ export const routes: Routes = [
     canActivateChild: [authGuardGuard],
     children: [
       {
+        path: 'auditoria',
+        title: 'Auditoría',
+        canActivate: [permisoGuardGuard],
+        data: { permiso: 'USUARIOS_ADMINISTRAR' },
+        loadComponent: () =>
+          import('./features/auditoria/pages/auditoria-list/auditoria-list').then(m => m.AuditoriaList),
+      },
+      {
         path: 'mi-cuenta',
         title: 'Mi cuenta',
         loadComponent: () => import('./features/auth/pages/mi-cuenta/mi-cuenta').then(m => m.MiCuenta),
