@@ -21,7 +21,9 @@ test('el vendedor registra una venta y Productos refleja el stock', async ({ pag
   expect(stockAntes).toBeGreaterThanOrEqual(2);
   await opcion.click();
   await page.getByTestId('cantidad').fill('2');
-  await expect(page.getByTestId('total-venta')).not.toContainText('0.00');
+  await expect.poll(async () => Number(
+    (await page.getByTestId('total-venta').innerText()).replace(/[^\d.-]/g, ''),
+  )).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Revisar venta', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Confirmar venta' });
   await dialog.getByRole('checkbox').uncheck();
@@ -33,6 +35,9 @@ test('el vendedor registra una venta y Productos refleja el stock', async ({ pag
   await expect(page.getByText('Venta registrada correctamente.')).toBeVisible();
   // Navegación Angular, sin recargar la página ni solicitar F5.
   await page.locator('a[href="/productos"]').first().click();
+  if (process.env['E2E_CATEGORIA_ID']) {
+    await page.locator('select').first().selectOption(process.env['E2E_CATEGORIA_ID']);
+  }
   const fila = page
     .getByTestId('tabla-productos')
     .locator('tbody tr')
