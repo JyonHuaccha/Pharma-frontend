@@ -27,6 +27,7 @@ export class ProductoForm implements OnInit {
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly erroresServidor = signal<Record<string, string>>({});
+  protected readonly autorModificacion = signal<string | null>(null);
   protected readonly form = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     precio: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
@@ -63,6 +64,7 @@ export class ProductoForm implements OnInit {
         next: ({ categorias, producto }) => {
           this.categorias.set(categorias);
           this.categoriaOriginal.set(producto.categoriaId);
+          this.autorModificacion.set(producto.modificadoPor ?? producto.creadoPor ?? null);
           this.form.setValue({
             nombre: producto.nombre,
             precio: producto.precio,

@@ -19,6 +19,7 @@
 </div>
 </header>
 <dl class="datos">
+@if (v.creadoPor) { <div><dt>Registrado por</dt><dd>{{ v.creadoPor }}</dd></div> }
 <div><dt>Fecha</dt><dd>{{ v.fecha | date: 'dd/MM/yyyy HH:mm' }}</dd></div>
 <div><dt>Cliente</dt><dd>{{ v.clienteNombre }}</dd></div>
 @if (cliente(); as c) {

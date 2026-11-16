@@ -63,6 +63,7 @@
       <span>Producto Activo</span>
     </label>
 
+    @if (autorModificacion(); as usuario) { <p>Modificado por {{ usuario }}</p> }
     <div class="acciones">
       <button type="submit" class="btn btn-primary" [disabled]="guardando()">
         {{ guardando() ? 'Guardando...' : (esEdicion() ? 'Actualizar' : 'Guardar') }}

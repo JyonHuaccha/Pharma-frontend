@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { MainLayout } from './layout/main-layout/main-layout';
-import { NoEncontrado } from './shared/pages/no-encontrado/no-encontrado';
 import { authGuardGuard, invitadoGuard } from './core/guards/auth-guard-guard';
 import { permisoGuardGuard } from './core/guards/permiso-guard-guard';
 
@@ -13,10 +11,18 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: MainLayout,
+    loadComponent: () => import('./layout/main-layout/main-layout').then(m => m.MainLayout),
     canActivate: [authGuardGuard],
     canActivateChild: [authGuardGuard],
     children: [
+      {
+        path: 'auditoria',
+        title: 'Auditoría',
+        canActivate: [permisoGuardGuard],
+        data: { permiso: 'USUARIOS_ADMINISTRAR' },
+        loadComponent: () =>
+          import('./features/auditoria/pages/auditoria-list/auditoria-list').then(m => m.AuditoriaList),
+      },
       {
         path: 'mi-cuenta',
         title: 'Mi cuenta',
@@ -77,6 +83,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    component: NoEncontrado,
+    loadComponent: () => import('./shared/pages/no-encontrado/no-encontrado').then(m => m.NoEncontrado),
   },
 ];

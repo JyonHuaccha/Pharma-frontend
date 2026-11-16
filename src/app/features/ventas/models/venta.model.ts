@@ -13,6 +13,7 @@ id: number;
 fecha: string;
 clienteId: number;
 clienteNombre: string;
+creadoPor?: string | null;
 estado: EstadoVenta;
 total: number;
 detalles: DetalleVenta[];

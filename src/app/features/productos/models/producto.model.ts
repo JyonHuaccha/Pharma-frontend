@@ -6,6 +6,8 @@ export interface Producto {
   estado: boolean;
   categoriaId: number;
   categoriaNombre: string;
+  creadoPor?: string | null;
+  modificadoPor?: string | null;
   fechaCreacion: string;
   fechaModificacion: string | null;
 }

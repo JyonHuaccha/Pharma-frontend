@@ -1,0 +1,81 @@
+<section class="page">
+  <header>
+    <div>
+      <h2>Auditoría</h2>
+      <p>Historial de operaciones y códigos de seguimiento.</p>
+    </div>
+  </header>
+  <form [formGroup]="filtros" (ngSubmit)="buscar()" class="filtros">
+    <label
+      >Usuario<input class="input" formControlName="usuario" placeholder="Ej. vendedor"
+    /></label>
+    <label
+      >Acción<select class="input" formControlName="accion" aria-label="Acción">
+        <option value="">Todas</option>
+        @for (a of acciones; track a) {
+          <option [value]="a">{{ a }}</option>
+        }
+      </select></label
+    >
+    <label>Desde<input class="input" type="date" formControlName="desde" /></label>
+    <label>Hasta<input class="input" type="date" formControlName="hasta" /></label>
+    <div class="botones">
+      <button type="button" class="btn" (click)="limpiar()">Limpiar</button>
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+  </form>
+  @if (error()) {
+    <p role="alert" class="alerta">{{ error() }}</p>
+  }
+  @if (recurso.isLoading()) {
+    <p role="status">Consultando auditoría...</p>
+  }
+  @if (recurso.hasValue()) {
+    @let r = recurso.value();
+    <div class="tabla-contenedor">
+      <table class="tabla" data-testid="tabla-auditoria">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Entidad</th>
+            <th>ID</th>
+            <th>Detalle</th>
+            <th>Request ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (evento of r.contenido; track evento.id) {
+            <tr>
+              <td class="fecha">{{ evento.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td>{{ evento.usuario }}</td>
+              <td>
+                <span class="accion">{{ evento.accion }}</span>
+              </td>
+              <td>{{ evento.entidad }}</td>
+              <td>{{ evento.entidadId ?? '—' }}</td>
+              <td class="detalle">{{ evento.detalle || '—' }}</td>
+              <td>
+                <code>{{ evento.requestId || '—' }}</code>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="vacio">No hay eventos con esos filtros.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-paginador
+      [pagina]="r.pagina"
+      [tamanio]="r.tamanio"
+      [totalPaginas]="r.totalPaginas"
+      [totalElementos]="r.totalElementos"
+      [cargando]="recurso.isLoading()"
+      (cambioPagina)="irA($event)"
+      (cambioTamanio)="cambiarTamanio($event)"
+    />
+  }
+</section>

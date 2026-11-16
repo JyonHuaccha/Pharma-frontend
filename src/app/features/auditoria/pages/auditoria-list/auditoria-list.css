@@ -1,0 +1,113 @@
+.page {
+  padding: 1.5rem;
+  color: #182f51;
+}
+header {
+  margin-bottom: 1.5rem;
+}
+header h2 {
+  margin: 0 0 0.5rem;
+}
+header p {
+  margin: 0;
+  color: #52647d;
+}
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  padding: 1.2rem;
+  background: white;
+  border: 1px solid #d9e1ec;
+  border-radius: 0.7rem;
+  margin-bottom: 1.25rem;
+}
+label {
+  display: flex;
+  flex: 1 1 150px;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+.input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid #c6d2e4;
+  border-radius: 0.35rem;
+  background: white;
+  font: inherit;
+  color: inherit;
+  box-sizing: border-box;
+}
+.botones {
+  display: flex;
+  gap: 0.5rem;
+}
+.btn {
+  border: 1px solid #c6d2e4;
+  background: white;
+  color: #182f51;
+  padding: 0.65rem 1rem;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  font: inherit;
+}
+.btn-primary {
+  background: #1c2f59;
+  color: white;
+  border-color: #1c2f59;
+}
+.tabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid #d9e1ec;
+  border-radius: 0.65rem;
+  background: white;
+}
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: #1c2f59;
+  color: white;
+  text-align: left;
+  padding: 1rem 0.8rem;
+}
+td {
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid #e1e7f0;
+  vertical-align: top;
+}
+.fecha {
+  white-space: nowrap;
+}
+.detalle {
+  min-width: 160px;
+  max-width: 330px;
+  overflow-wrap: anywhere;
+}
+.accion {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+code {
+  white-space: nowrap;
+  background: #eef2f8;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.25rem;
+}
+.vacio {
+  text-align: center;
+  color: #52647d;
+  padding: 2rem;
+}
+.alerta {
+  padding: 1rem;
+  background: #fff1f1;
+  border: 1px solid #e5b1b1;
+  border-radius: 0.4rem;
+  color: #9c2525;
+}

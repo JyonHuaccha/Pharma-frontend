@@ -1,0 +1,26 @@
+<section class="card" aria-labelledby="titulo-mas-vendidos">
+  <h2 id="titulo-mas-vendidos">Productos más vendidos</h2>
+  @if (error()) {
+    <p role="alert">No se pudo consultar el reporte. Recargue la página para intentarlo nuevamente.</p>
+  } @else if (filas() === null) {
+    <p role="status">Consultando productos más vendidos…</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table>
+        <thead><tr><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Monto</th></tr></thead>
+        <tbody>
+          @for (fila of filas(); track fila.productoId) {
+            <tr>
+              <td>{{ fila.productoNombre }}</td>
+              <td>{{ fila.categoriaNombre }}</td>
+              <td>{{ fila.cantidadVendida }}</td>
+              <td>{{ fila.montoTotal | currency: 'PEN' : 'S/ ' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4">Aún no hay ventas registradas.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
